@@ -1,0 +1,598 @@
+openapi: 3.0.1
+info:
+  title: fulfillment/v1/cluster_order_type.proto
+  version: version not set
+servers:
+- url: /
+tags:
+- name: ClusterOrdersService
+- name: ClusterTemplatesService
+- name: ClustersService
+paths:
+  /api/fulfilment/v1/cluster_orders:
+    get:
+      tags:
+      - ClusterOrdersService
+      summary: Retrieves the list of cluster orders.
+      operationId: ClusterOrdersService_List
+      parameters:
+      - name: offset
+        in: query
+        description: Index of the first result. If not specified the default value
+          will be zero.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: limit
+        in: query
+        description: |-
+          Maximum number of results to be returned by the server. When not specified all the results will be returned. Note
+          that there may not be enough results to return, and that the server may decide, for performance reasons, to return
+          less results than requested.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: search
+        in: query
+        description: |-
+          Search criteria.
+
+          The syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names
+          of the attributes of the order instead of the names of the columns of a table. For example, in order to retrieve
+          all the orders with state `FULFILLED` the value should be:
+
+              statu == 'FULLFILLED'
+
+          If this isn't provided, or if the value is empty, then all the orders that the user has permission to see will be
+          returned.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: |-
+          Sort criteria.
+
+          The syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the
+          names of the attributes of the order instead of the names of the columns of a table. For example, in order to sort
+          the orders descending by state the value should be:
+
+              state desc
+
+          If the parameter isn't provided, or if the value is empty, then the order of the results is undefined.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterOrdersServiceListResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+    post:
+      tags:
+      - ClusterOrdersService
+      summary: Places a new cluster order.
+      operationId: ClusterOrdersService_Place
+      parameters:
+      - name: order.id
+        in: query
+        description: Unique identifier of the order. This will be automatically generated
+          by the system when the order is placed.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: order.template_id
+        in: query
+        description: |-
+          Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster
+          templates.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: order.state
+        in: query
+        description: |-
+          State indicates the current state of the processing of the order.
+
+           - CLUSTER_ORDER_STATE_UNSPECIFIED: Unknown indicates that the value isn't set.
+           - CLUSTER_ORDER_STATE_ACCEPTED: Accepted indicates that the order has been accepted by the system.
+           - CLUSTER_ORDER_STATE_REJECTED: Rejected indicates that the order has been rejected by the system.
+           - CLUSTER_ORDER_STATE_CANCELED: Rejected indicates that the order has been canceled by the user.
+           - CLUSTER_ORDER_STATE_FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
+           - CLUSTER_ORDER_STATE_FAILED: Failed indicates that fulfillment of the order failed.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: CLUSTER_ORDER_STATE_UNSPECIFIED
+          enum:
+          - CLUSTER_ORDER_STATE_UNSPECIFIED
+          - CLUSTER_ORDER_STATE_ACCEPTED
+          - CLUSTER_ORDER_STATE_REJECTED
+          - CLUSTER_ORDER_STATE_CANCELED
+          - CLUSTER_ORDER_STATE_FULFILLED
+          - CLUSTER_ORDER_STATE_FAILED
+      - name: order.cluster_id
+        in: query
+        description: |-
+          Reference to the resulting cluster. This will be automatically populated by the system when the requested cluster
+          is completely provisoned. Further details about the cluster, like the API URL, will be available there.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterOrdersServicePlaceResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+  /api/fulfilment/v1/cluster_orders/{order_id}:
+    get:
+      tags:
+      - ClusterOrdersService
+      summary: Retrieves the details of one specific cluster order.
+      operationId: ClusterOrdersService_Get
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterOrdersServiceGetResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+    delete:
+      tags:
+      - ClusterOrdersService
+      summary: Cancels a cluster order.
+      operationId: ClusterOrdersService_Cancel
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterOrdersServiceCancelResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+  /api/fulfilment/v1/cluster_templates:
+    get:
+      tags:
+      - ClusterTemplatesService
+      summary: Retrieves the list of cluster templates.
+      operationId: ClusterTemplatesService_List
+      parameters:
+      - name: offset
+        in: query
+        description: Index of the first result. If not specified the default value
+          will be zero.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: limit
+        in: query
+        description: |-
+          Maximum number of results to be returned by the server. When not specified all the results will be returned. Note
+          that there may not be enough results to return, and that the server may decide, for performance reasons, to return
+          less results than requested.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: search
+        in: query
+        description: |-
+          Search criteria.
+
+          The syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names
+          of the attributes of the template instead of the names of the columns of a table. For example, in order to retrieve
+          all the templates with a title starting with `large` the value should be:
+
+              title like 'large%'
+
+          If this isn't provided, or if the value is empty, then all the templates that the user has permission to see will
+          be returned.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: |-
+          Sort criteria.
+
+          The syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the
+          names of the attributes of the templated instead of the names of the columns of a table. For example, in order to
+          sort the templates descending by title the value should be:
+
+              name desc
+
+          If the parameter isn't provided, or if the value is empty, then the order of the results is undefined.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterTemplatesServiceListResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+  /api/fulfilment/v1/cluster_templates/{template_id}:
+    get:
+      tags:
+      - ClusterTemplatesService
+      summary: Retrieves the details of one specific cluster template.
+      operationId: ClusterTemplatesService_Get
+      parameters:
+      - name: template_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterTemplatesServiceGetResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+  /api/fulfilment/v1/clusters:
+    get:
+      tags:
+      - ClustersService
+      summary: Retrieves the list of clusters.
+      operationId: ClustersService_List
+      parameters:
+      - name: offset
+        in: query
+        description: Index of the first result. If not specified the default value
+          will be zero.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: limit
+        in: query
+        description: |-
+          Maximum number of results to be returned by the server. When not specified all the results will be returned. Note
+          that there may not be enough results to return, and that the server may decide, for performance reasons, to return
+          less results than requested.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: search
+        in: query
+        description: |-
+          Search criteria.
+
+          The syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names
+          of the attributes of the cluster instead of the names of the columns of a table. For example, in order to retrieve
+          all the cluster with a API URL starting with `http:` the value should be:
+
+              title api_url 'http:%'
+
+          If this isn't provided, or if the value is empty, then all the clusters that the user has permission to see will be
+          returned.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: |-
+          Sort criteria.
+
+          The syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the
+          names of the attributes of the cluster instead of the names of the columns of a table. For example, in order to
+          sort the clusters descending by API URL the value should be:
+
+              api_url desc
+
+          If the parameter isn't provided, or if the value is empty, then the order of the results is undefined.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClustersServiceListResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+  /api/fulfilment/v1/clusters/{cluster_id}:
+    get:
+      tags:
+      - ClustersService
+      summary: Retrieves the details of one specific cluster.
+      operationId: ClustersService_Get
+      parameters:
+      - name: cluster_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClustersServiceGetResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+components:
+  schemas:
+    protobufAny:
+      type: object
+      properties:
+        '@type':
+          type: string
+      additionalProperties:
+        type: object
+    rpcStatus:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/protobufAny"
+    v1Cluster:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the cluster.
+        api_url:
+          type: string
+          description: URL of te API server of the cluster.
+        console_url:
+          type: string
+          description: URL of the console of the cluster.
+      description: A cluster contains the details of a cluster that has already been
+        completely provisioned.
+    v1ClusterOrder:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the order. This will be automatically
+            generated by the system when the order is placed.
+        template_id:
+          type: string
+          description: |-
+            Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster
+            templates.
+        state:
+          $ref: "#/components/schemas/v1ClusterOrderState"
+        cluster_id:
+          type: string
+          description: |-
+            Reference to the resulting cluster. This will be automatically populated by the system when the requested cluster
+            is completely provisoned. Further details about the cluster, like the API URL, will be available there.
+      description: |-
+        A cluster order contains all the details that the user has to provide to request the provisioning of a cluster, as
+        well as the details of the status of the fulfillment process.
+    v1ClusterOrderState:
+      type: string
+      description: |2-
+         - CLUSTER_ORDER_STATE_UNSPECIFIED: Unknown indicates that the value isn't set.
+         - CLUSTER_ORDER_STATE_ACCEPTED: Accepted indicates that the order has been accepted by the system.
+         - CLUSTER_ORDER_STATE_REJECTED: Rejected indicates that the order has been rejected by the system.
+         - CLUSTER_ORDER_STATE_CANCELED: Rejected indicates that the order has been canceled by the user.
+         - CLUSTER_ORDER_STATE_FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
+         - CLUSTER_ORDER_STATE_FAILED: Failed indicates that fulfillment of the order failed.
+      default: CLUSTER_ORDER_STATE_UNSPECIFIED
+      enum:
+      - CLUSTER_ORDER_STATE_UNSPECIFIED
+      - CLUSTER_ORDER_STATE_ACCEPTED
+      - CLUSTER_ORDER_STATE_REJECTED
+      - CLUSTER_ORDER_STATE_CANCELED
+      - CLUSTER_ORDER_STATE_FULFILLED
+      - CLUSTER_ORDER_STATE_FAILED
+    v1ClusterOrdersServiceCancelResponse:
+      type: object
+    v1ClusterOrdersServiceGetResponse:
+      type: object
+      properties:
+        order:
+          $ref: "#/components/schemas/v1ClusterOrder"
+    v1ClusterOrdersServiceListResponse:
+      type: object
+      properties:
+        size:
+          type: integer
+          description: |-
+            Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
+            of the request if there are not enough items, or of the system decides that returning that number of items isn't
+            feasible or convenient for performance reasons.
+          format: int32
+        total:
+          type: integer
+          description: |-
+            Total number of items of the collection that match the search criteria, regardless of the number of results
+            requested with the `limit` parameter.
+          format: int32
+        items:
+          type: array
+          description: List of results.
+          items:
+            $ref: "#/components/schemas/v1ClusterOrder"
+    v1ClusterOrdersServicePlaceResponse:
+      type: object
+      properties:
+        order:
+          $ref: "#/components/schemas/v1ClusterOrder"
+    v1ClusterTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the template.
+        title:
+          type: string
+          description: |-
+            Human friendly short description of the template, only a few words, suitable for displaying in one single
+            line on a UI or CLI.
+        description:
+          type: string
+          description: "Human friendly long description of the template, using Markdown\
+            \ format."
+      description: A cluster template defines a type of cluster that can be ordered
+        by the user.
+    v1ClusterTemplatesServiceGetResponse:
+      type: object
+      properties:
+        template:
+          $ref: "#/components/schemas/v1ClusterTemplate"
+    v1ClusterTemplatesServiceListResponse:
+      type: object
+      properties:
+        size:
+          type: integer
+          description: |-
+            Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
+            of the request if there are not enough items, or of the system decides that returning that number of items isn't
+            feasible or convenient for performance reasons.
+          format: int32
+        total:
+          type: integer
+          description: |-
+            Total number of items of the collection that match the search criteria, regardless of the number of results
+            requested with the `limit` parameter.
+          format: int32
+        items:
+          type: array
+          description: List of results.
+          items:
+            $ref: "#/components/schemas/v1ClusterTemplate"
+    v1ClustersServiceGetResponse:
+      type: object
+      properties:
+        cluster:
+          $ref: "#/components/schemas/v1Cluster"
+    v1ClustersServiceListResponse:
+      type: object
+      properties:
+        size:
+          type: integer
+          description: |-
+            Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
+            of the request if there are not enough items, or of the system decides that returning that number of items isn't
+            feasible or convenient for performance reasons.
+          format: int32
+        total:
+          type: integer
+          description: |-
+            Total number of items of the collection that match the search criteria, regardless of the number of results
+            requested with the `limit` parameter.
+          format: int32
+        items:
+          type: array
+          description: List of results.
+          items:
+            $ref: "#/components/schemas/v1Cluster"
+x-original-swagger-version: "2.0"

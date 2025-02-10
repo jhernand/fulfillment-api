@@ -1,0 +1,15 @@
+{
+        "version": "0.2.0",
+        "configurations": [
+                {
+                        "name": "dev setup",
+                        "type": "debugpy",
+                        "request": "launch",
+                        "console": "integratedTerminal",
+                        "program": "${workspaceFolder}/dev.py",
+                        "args": [
+                                "setup",
+                        ]
+                }
+        ]
+}
