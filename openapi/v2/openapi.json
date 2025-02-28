@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "fulfillment/v1/cluster_order_type.proto",
+    "title": "Foo fulfillment/v1/cluster_order_type.proto",
     "version": "version not set"
   },
   "tags": [
