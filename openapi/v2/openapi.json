@@ -13,6 +13,9 @@
     },
     {
       "name": "Clusters"
+    },
+    {
+      "name": "Events"
     }
   ],
   "consumes": [
@@ -58,15 +61,15 @@
             "format": "int32"
           },
           {
-            "name": "search",
-            "description": "Search criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the order instead of the names of the columns of a table. For example, in order to retrieve\nall the orders with state `FULFILLED` the value should be:\n\n    statu == 'FULLFILLED'\n\nIf this isn't provided, or if the value is empty, then all the orders that the user has permission to see will be\nreturned.",
+            "name": "filter",
+            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the order instead of the names of the columns of a table. For example, in order to retrieve\nall the orders with state `FULFILLED` the value should be:\n\n    state == 'FULLFILLED'\n\nIf this isn't provided, or if the value is empty, then all the orders that the user has permission to see will be\nreturned.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "sort",
-            "description": "Sort criteria.\n\nThe syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the\nnames of the attributes of the order instead of the names of the columns of a table. For example, in order to sort\nthe orders descending by state the value should be:\n\n    state desc\n\nIf the parameter isn't provided, or if the value is empty, then the order of the results is undefined.",
+            "name": "order",
+            "description": "Order criteria.\n\nThe syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the\nnames of the attributes of the order instead of the names of the columns of a table. For example, in order to sort\nthe orders descending by state the value should be:\n\n    state desc\n\nIf the parameter isn't provided, or if the value is empty, then the order of the results is undefined.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -233,15 +236,15 @@
             "format": "int32"
           },
           {
-            "name": "search",
-            "description": "Search criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the template instead of the names of the columns of a table. For example, in order to retrieve\nall the templates with a title starting with `large` the value should be:\n\n    title like 'large%'\n\nIf this isn't provided, or if the value is empty, then all the templates that the user has permission to see will\nbe returned.",
+            "name": "filter",
+            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the template instead of the names of the columns of a table. For example, in order to retrieve\nall the templates with a title starting with `large` the value should be:\n\n    title like 'large%'\n\nIf this isn't provided, or if the value is empty, then all the templates that the user has permission to see will\nbe returned.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "sort",
-            "description": "Sort criteria.\n\nThe syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the\nnames of the attributes of the templated instead of the names of the columns of a table. For example, in order to\nsort the templates descending by title the value should be:\n\n    name desc\n\nIf the parameter isn't provided, or if the value is empty, then the order of the results is undefined.",
+            "name": "order",
+            "description": "Order criteria.\n\nThe syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the\nnames of the attributes of the templated instead of the names of the columns of a table. For example, in order to\nsort the templates descending by title the value should be:\n\n    name desc\n\nIf the parameter isn't provided, or if the value is empty, then the order of the results is undefined.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -319,15 +322,15 @@
             "format": "int32"
           },
           {
-            "name": "search",
-            "description": "Search criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the cluster instead of the names of the columns of a table. For example, in order to retrieve\nall the cluster with a API URL starting with `http:` the value should be:\n\n    title api_url 'http:%'\n\nIf this isn't provided, or if the value is empty, then all the clusters that the user has permission to see will be\nreturned.",
+            "name": "filter",
+            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the cluster instead of the names of the columns of a table. For example, in order to retrieve\nall the cluster with a API URL starting with `http:` the value should be:\n\n    api_url like 'http:%'\n\nIf this isn't provided, or if the value is empty, then all the clusters that the user has permission to see will be\nreturned.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "sort",
-            "description": "Sort criteria.\n\nThe syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the\nnames of the attributes of the cluster instead of the names of the columns of a table. For example, in order to\nsort the clusters descending by API URL the value should be:\n\n    api_url desc\n\nIf the parameter isn't provided, or if the value is empty, then the order of the results is undefined.",
+            "name": "order",
+            "description": "Order criteria.\n\nThe syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the\nnames of the attributes of the cluster instead of the names of the columns of a table. For example, in order to\nsort the clusters descending by API URL the value should be:\n\n    api_url desc\n\nIf the parameter isn't provided, or if the value is empty, then the order of the results is undefined.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -368,6 +371,54 @@
           "Clusters"
         ]
       }
+    },
+    "/api/fulfilment/v1/events": {
+      "get": {
+        "summary": "Watches events.",
+        "operationId": "Events_Watch",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v1EventsWatchResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of v1EventsWatchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "from",
+            "description": "When this parameter is used the server will only send the events that are newer than the event with this\nidentifier. Note that the event with this identifier will *not* be sent.\n\nWhen this parameter isn't used the server will send only the events that are generated after the request is\nreceived.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the event instead of the names of the columns of a table. For example, in order to get only\nthe events of type `CREATED` the value should be:\n\n    type == 'CREATED'\n\nIf this isn't provided, or if the value is empty, then all the events that the user has permission to see will be\nreturned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Events"
+        ]
+      }
     }
   },
   "definitions": {
@@ -388,10 +439,12 @@
       "type": "object",
       "properties": {
         "@type": {
-          "type": "string"
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
         }
       },
-      "additionalProperties": {}
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "rpcStatus": {
       "type": "object",
@@ -571,6 +624,47 @@
             "$ref": "#/definitions/v1Cluster"
           },
           "description": "List of results."
+        }
+      }
+    },
+    "v1Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the event. This will be automatically generated by the system when the event is generated.\n\nThe only guarantee about the values of these identifiers is that they are unique. Note in particular that there\nis no guarantee of order: clients should refrain from assuming that they are ordered in any way."
+        },
+        "type": {
+          "$ref": "#/definitions/v1EventType",
+          "description": "Type of event."
+        },
+        "old": {
+          "$ref": "#/definitions/protobufAny",
+          "description": "Old contains the representation of the object before update or delete. It will be empty for other types of events."
+        },
+        "new": {
+          "$ref": "#/definitions/protobufAny",
+          "description": "New contains the representation of the object after creation or update. It will be empty for other types of events."
+        }
+      },
+      "description": "Events are generated by the system when objects are created, updated or deleted."
+    },
+    "v1EventType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "CREATE",
+        "UPDATE",
+        "DELETE"
+      ],
+      "default": "UNSPECIFIED",
+      "description": " - UNSPECIFIED: Unspecified indicates that the type of event hasn't been specified.\n - CREATE: Create indicates that a new object has been created. The `new` field will contain the represenation of that\nobject. The `old` field will be empty.\n - UPDATE: Update indicates that an existing object has been updated. The `old` and `new` fields will contain the\nrepresentations of the object before and after the update.\n - DELETE: Delete indicates that an object has been deleted. The `old` field will contain the representation of the object\nright before it was deleted. The `new` field will be empty."
+    },
+    "v1EventsWatchResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/definitions/v1Event"
         }
       }
     }
