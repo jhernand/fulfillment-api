@@ -6,13 +6,13 @@
   },
   "tags": [
     {
-      "name": "ClusterOrdersService"
+      "name": "ClusterOrders"
     },
     {
-      "name": "ClusterTemplatesService"
+      "name": "ClusterTemplates"
     },
     {
-      "name": "ClustersService"
+      "name": "Clusters"
     }
   ],
   "consumes": [
@@ -25,12 +25,12 @@
     "/api/fulfilment/v1/cluster_orders": {
       "get": {
         "summary": "Retrieves the list of cluster orders.",
-        "operationId": "ClusterOrdersService_List",
+        "operationId": "ClusterOrders_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersServiceListResponse"
+              "$ref": "#/definitions/v1ClusterOrdersListResponse"
             }
           },
           "default": {
@@ -73,17 +73,17 @@
           }
         ],
         "tags": [
-          "ClusterOrdersService"
+          "ClusterOrders"
         ]
       },
       "post": {
         "summary": "Places a new cluster order.",
-        "operationId": "ClusterOrdersService_Place",
+        "operationId": "ClusterOrders_Place",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersServicePlaceResponse"
+              "$ref": "#/definitions/v1ClusterOrdersPlaceResponse"
             }
           },
           "default": {
@@ -133,19 +133,19 @@
           }
         ],
         "tags": [
-          "ClusterOrdersService"
+          "ClusterOrders"
         ]
       }
     },
     "/api/fulfilment/v1/cluster_orders/{order_id}": {
       "get": {
         "summary": "Retrieves the details of one specific cluster order.",
-        "operationId": "ClusterOrdersService_Get",
+        "operationId": "ClusterOrders_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersServiceGetResponse"
+              "$ref": "#/definitions/v1ClusterOrdersGetResponse"
             }
           },
           "default": {
@@ -164,17 +164,17 @@
           }
         ],
         "tags": [
-          "ClusterOrdersService"
+          "ClusterOrders"
         ]
       },
       "delete": {
         "summary": "Cancels a cluster order.",
-        "operationId": "ClusterOrdersService_Cancel",
+        "operationId": "ClusterOrders_Cancel",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersServiceCancelResponse"
+              "$ref": "#/definitions/v1ClusterOrdersCancelResponse"
             }
           },
           "default": {
@@ -193,19 +193,19 @@
           }
         ],
         "tags": [
-          "ClusterOrdersService"
+          "ClusterOrders"
         ]
       }
     },
     "/api/fulfilment/v1/cluster_templates": {
       "get": {
         "summary": "Retrieves the list of cluster templates.",
-        "operationId": "ClusterTemplatesService_List",
+        "operationId": "ClusterTemplates_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterTemplatesServiceListResponse"
+              "$ref": "#/definitions/v1ClusterTemplatesListResponse"
             }
           },
           "default": {
@@ -248,19 +248,19 @@
           }
         ],
         "tags": [
-          "ClusterTemplatesService"
+          "ClusterTemplates"
         ]
       }
     },
     "/api/fulfilment/v1/cluster_templates/{template_id}": {
       "get": {
         "summary": "Retrieves the details of one specific cluster template.",
-        "operationId": "ClusterTemplatesService_Get",
+        "operationId": "ClusterTemplates_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterTemplatesServiceGetResponse"
+              "$ref": "#/definitions/v1ClusterTemplatesGetResponse"
             }
           },
           "default": {
@@ -279,19 +279,19 @@
           }
         ],
         "tags": [
-          "ClusterTemplatesService"
+          "ClusterTemplates"
         ]
       }
     },
     "/api/fulfilment/v1/clusters": {
       "get": {
         "summary": "Retrieves the list of clusters.",
-        "operationId": "ClustersService_List",
+        "operationId": "Clusters_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClustersServiceListResponse"
+              "$ref": "#/definitions/v1ClustersListResponse"
             }
           },
           "default": {
@@ -334,19 +334,19 @@
           }
         ],
         "tags": [
-          "ClustersService"
+          "Clusters"
         ]
       }
     },
     "/api/fulfilment/v1/clusters/{cluster_id}": {
       "get": {
         "summary": "Retrieves the details of one specific cluster.",
-        "operationId": "ClustersService_Get",
+        "operationId": "Clusters_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClustersServiceGetResponse"
+              "$ref": "#/definitions/v1ClustersGetResponse"
             }
           },
           "default": {
@@ -365,12 +365,25 @@
           }
         ],
         "tags": [
-          "ClustersService"
+          "Clusters"
         ]
       }
     }
   },
   "definitions": {
+    "ClusterOrderState": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "ACCEPTED",
+        "REJECTED",
+        "CANCELED",
+        "FULFILLED",
+        "FAILED"
+      ],
+      "default": "UNSPECIFIED",
+      "description": " - UNSPECIFIED: Unspecified indicates that the value isn't set.\n - ACCEPTED: Accepted indicates that the order has been accepted by the system.\n - REJECTED: Rejected indicates that the order has been rejected by the system.\n - CANCELED: Rejected indicates that the order has been canceled by the user.\n - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.\n - FAILED: Failed indicates that fulfillment of the order failed."
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -429,7 +442,7 @@
           "description": "Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster\ntemplates."
         },
         "state": {
-          "$ref": "#/definitions/v1ClusterOrderState",
+          "$ref": "#/definitions/ClusterOrderState",
           "description": "State indicates the current state of the processing of the order."
         },
         "cluster_id": {
@@ -439,23 +452,10 @@
       },
       "description": "A cluster order contains all the details that the user has to provide to request the provisioning of a cluster, as\nwell as the details of the status of the fulfillment process."
     },
-    "v1ClusterOrderState": {
-      "type": "string",
-      "enum": [
-        "UNSPECIFIED",
-        "ACCEPTED",
-        "REJECTED",
-        "CANCELED",
-        "FULFILLED",
-        "FAILED"
-      ],
-      "default": "UNSPECIFIED",
-      "description": " - UNSPECIFIED: Unspecified indicates that the value isn't set.\n - ACCEPTED: Accepted indicates that the order has been accepted by the system.\n - REJECTED: Rejected indicates that the order has been rejected by the system.\n - CANCELED: Rejected indicates that the order has been canceled by the user.\n - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.\n - FAILED: Failed indicates that fulfillment of the order failed."
-    },
-    "v1ClusterOrdersServiceCancelResponse": {
+    "v1ClusterOrdersCancelResponse": {
       "type": "object"
     },
-    "v1ClusterOrdersServiceGetResponse": {
+    "v1ClusterOrdersGetResponse": {
       "type": "object",
       "properties": {
         "order": {
@@ -463,7 +463,7 @@
         }
       }
     },
-    "v1ClusterOrdersServiceListResponse": {
+    "v1ClusterOrdersListResponse": {
       "type": "object",
       "properties": {
         "size": {
@@ -486,7 +486,7 @@
         }
       }
     },
-    "v1ClusterOrdersServicePlaceResponse": {
+    "v1ClusterOrdersPlaceResponse": {
       "type": "object",
       "properties": {
         "order": {
@@ -512,7 +512,7 @@
       },
       "description": "A cluster template defines a type of cluster that can be ordered by the user."
     },
-    "v1ClusterTemplatesServiceGetResponse": {
+    "v1ClusterTemplatesGetResponse": {
       "type": "object",
       "properties": {
         "template": {
@@ -520,7 +520,7 @@
         }
       }
     },
-    "v1ClusterTemplatesServiceListResponse": {
+    "v1ClusterTemplatesListResponse": {
       "type": "object",
       "properties": {
         "size": {
@@ -543,7 +543,7 @@
         }
       }
     },
-    "v1ClustersServiceGetResponse": {
+    "v1ClustersGetResponse": {
       "type": "object",
       "properties": {
         "cluster": {
@@ -551,7 +551,7 @@
         }
       }
     },
-    "v1ClustersServiceListResponse": {
+    "v1ClustersListResponse": {
       "type": "object",
       "properties": {
         "size": {

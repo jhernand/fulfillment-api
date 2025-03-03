@@ -20,7 +20,7 @@ import "google/api/annotations.proto";
 
 import "fulfillment/v1/cluster_template_type.proto";
 
-message ClusterTemplatesServiceListRequest {
+message ClusterTemplatesListRequest {
   // Index of the first result. If not specified the default value will be zero.
   optional int32 offset = 1;
 
@@ -53,7 +53,7 @@ message ClusterTemplatesServiceListRequest {
   optional string sort = 4;
 }
 
-message ClusterTemplatesServiceListResponse {
+message ClusterTemplatesListResponse {
   // Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
   // of the request if there are not enough items, or of the system decides that returning that number of items isn't
   // feasible or convenient for performance reasons.
@@ -67,24 +67,24 @@ message ClusterTemplatesServiceListResponse {
   repeated ClusterTemplate items = 5;
 }
 
-message ClusterTemplatesServiceGetRequest {
+message ClusterTemplatesGetRequest {
   string template_id = 1;
 }
 
-message ClusterTemplatesServiceGetResponse {
+message ClusterTemplatesGetResponse {
   ClusterTemplate template = 1;
 }
 
-service ClusterTemplatesService {
+service ClusterTemplates {
   // Retrieves the list of cluster templates.
-  rpc List(ClusterTemplatesServiceListRequest) returns (ClusterTemplatesServiceListResponse) {
+  rpc List(ClusterTemplatesListRequest) returns (ClusterTemplatesListResponse) {
     option (google.api.http) = {
       get: "/api/fulfilment/v1/cluster_templates"
     };
   }
 
   // Retrieves the details of one specific cluster template.
-  rpc Get(ClusterTemplatesServiceGetRequest) returns (ClusterTemplatesServiceGetResponse) {
+  rpc Get(ClusterTemplatesGetRequest) returns (ClusterTemplatesGetResponse) {
     option (google.api.http) = {
       get: "/api/fulfilment/v1/cluster_templates/{template_id}"
     };

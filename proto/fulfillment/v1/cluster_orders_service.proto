@@ -20,7 +20,7 @@ import "google/api/annotations.proto";
 
 import "fulfillment/v1/cluster_order_type.proto";
 
-message ClusterOrdersServiceListRequest {
+message ClusterOrdersListRequest {
   // Index of the first result. If not specified the default value will be zero.
   optional int32 offset = 1;
 
@@ -53,7 +53,7 @@ message ClusterOrdersServiceListRequest {
   optional string sort = 4;
 }
 
-message ClusterOrdersServiceListResponse {
+message ClusterOrdersListResponse {
   // Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
   // of the request if there are not enough items, or of the system decides that returning that number of items isn't
   // feasible or convenient for performance reasons.
@@ -67,53 +67,53 @@ message ClusterOrdersServiceListResponse {
   repeated ClusterOrder items = 5;
 }
 
-message ClusterOrdersServiceGetRequest {
+message ClusterOrdersGetRequest {
   string order_id = 1;
 }
 
-message ClusterOrdersServiceGetResponse {
+message ClusterOrdersGetResponse {
   ClusterOrder order = 1;
 }
 
-message ClusterOrdersServicePlaceRequest {
+message ClusterOrdersPlaceRequest {
   ClusterOrder order = 1;
 }
 
-message ClusterOrdersServicePlaceResponse {
+message ClusterOrdersPlaceResponse {
   ClusterOrder order = 1;
 }
 
-message ClusterOrdersServiceCancelRequest {
+message ClusterOrdersCancelRequest {
   string order_id = 1;
 }
 
-message ClusterOrdersServiceCancelResponse {
+message ClusterOrdersCancelResponse {
 }
 
-service ClusterOrdersService {
+service ClusterOrders {
   // Retrieves the list of cluster orders.
-  rpc List(ClusterOrdersServiceListRequest) returns (ClusterOrdersServiceListResponse) {
+  rpc List(ClusterOrdersListRequest) returns (ClusterOrdersListResponse) {
     option (google.api.http) = {
       get: "/api/fulfilment/v1/cluster_orders"
     };
   }
 
   // Retrieves the details of one specific cluster order.
-  rpc Get(ClusterOrdersServiceGetRequest) returns (ClusterOrdersServiceGetResponse) {
+  rpc Get(ClusterOrdersGetRequest) returns (ClusterOrdersGetResponse) {
     option (google.api.http) = {
       get: "/api/fulfilment/v1/cluster_orders/{order_id}"
     };
   }
   
   // Places a new cluster order.
-  rpc Place(ClusterOrdersServicePlaceRequest) returns (ClusterOrdersServicePlaceResponse) {
+  rpc Place(ClusterOrdersPlaceRequest) returns (ClusterOrdersPlaceResponse) {
     option (google.api.http) = {
       post: "/api/fulfilment/v1/cluster_orders"
     };
   }
 
   // Cancels a cluster order.
-  rpc Cancel(ClusterOrdersServiceCancelRequest) returns (ClusterOrdersServiceCancelResponse) {
+  rpc Cancel(ClusterOrdersCancelRequest) returns (ClusterOrdersCancelResponse) {
     option (google.api.http) = {
       delete: "/api/fulfilment/v1/cluster_orders/{order_id}"
     };

@@ -5,16 +5,16 @@ info:
 servers:
 - url: /
 tags:
-- name: ClusterOrdersService
-- name: ClusterTemplatesService
-- name: ClustersService
+- name: ClusterOrders
+- name: ClusterTemplates
+- name: Clusters
 paths:
   /api/fulfilment/v1/cluster_orders:
     get:
       tags:
-      - ClusterOrdersService
+      - ClusterOrders
       summary: Retrieves the list of cluster orders.
-      operationId: ClusterOrdersService_List
+      operationId: ClusterOrders_List
       parameters:
       - name: offset
         in: query
@@ -79,7 +79,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterOrdersServiceListResponse"
+                $ref: "#/components/schemas/v1ClusterOrdersListResponse"
         default:
           description: An unexpected error response.
           content:
@@ -88,9 +88,9 @@ paths:
                 $ref: "#/components/schemas/rpcStatus"
     post:
       tags:
-      - ClusterOrdersService
+      - ClusterOrders
       summary: Places a new cluster order.
-      operationId: ClusterOrdersService_Place
+      operationId: ClusterOrders_Place
       parameters:
       - name: order.id
         in: query
@@ -151,7 +151,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterOrdersServicePlaceResponse"
+                $ref: "#/components/schemas/v1ClusterOrdersPlaceResponse"
         default:
           description: An unexpected error response.
           content:
@@ -161,9 +161,9 @@ paths:
   /api/fulfilment/v1/cluster_orders/{order_id}:
     get:
       tags:
-      - ClusterOrdersService
+      - ClusterOrders
       summary: Retrieves the details of one specific cluster order.
-      operationId: ClusterOrdersService_Get
+      operationId: ClusterOrders_Get
       parameters:
       - name: order_id
         in: path
@@ -178,7 +178,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterOrdersServiceGetResponse"
+                $ref: "#/components/schemas/v1ClusterOrdersGetResponse"
         default:
           description: An unexpected error response.
           content:
@@ -187,9 +187,9 @@ paths:
                 $ref: "#/components/schemas/rpcStatus"
     delete:
       tags:
-      - ClusterOrdersService
+      - ClusterOrders
       summary: Cancels a cluster order.
-      operationId: ClusterOrdersService_Cancel
+      operationId: ClusterOrders_Cancel
       parameters:
       - name: order_id
         in: path
@@ -204,7 +204,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterOrdersServiceCancelResponse"
+                $ref: "#/components/schemas/v1ClusterOrdersCancelResponse"
         default:
           description: An unexpected error response.
           content:
@@ -214,9 +214,9 @@ paths:
   /api/fulfilment/v1/cluster_templates:
     get:
       tags:
-      - ClusterTemplatesService
+      - ClusterTemplates
       summary: Retrieves the list of cluster templates.
-      operationId: ClusterTemplatesService_List
+      operationId: ClusterTemplates_List
       parameters:
       - name: offset
         in: query
@@ -281,7 +281,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterTemplatesServiceListResponse"
+                $ref: "#/components/schemas/v1ClusterTemplatesListResponse"
         default:
           description: An unexpected error response.
           content:
@@ -291,9 +291,9 @@ paths:
   /api/fulfilment/v1/cluster_templates/{template_id}:
     get:
       tags:
-      - ClusterTemplatesService
+      - ClusterTemplates
       summary: Retrieves the details of one specific cluster template.
-      operationId: ClusterTemplatesService_Get
+      operationId: ClusterTemplates_Get
       parameters:
       - name: template_id
         in: path
@@ -308,7 +308,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterTemplatesServiceGetResponse"
+                $ref: "#/components/schemas/v1ClusterTemplatesGetResponse"
         default:
           description: An unexpected error response.
           content:
@@ -318,9 +318,9 @@ paths:
   /api/fulfilment/v1/clusters:
     get:
       tags:
-      - ClustersService
+      - Clusters
       summary: Retrieves the list of clusters.
-      operationId: ClustersService_List
+      operationId: Clusters_List
       parameters:
       - name: offset
         in: query
@@ -385,7 +385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClustersServiceListResponse"
+                $ref: "#/components/schemas/v1ClustersListResponse"
         default:
           description: An unexpected error response.
           content:
@@ -395,9 +395,9 @@ paths:
   /api/fulfilment/v1/clusters/{cluster_id}:
     get:
       tags:
-      - ClustersService
+      - Clusters
       summary: Retrieves the details of one specific cluster.
-      operationId: ClustersService_Get
+      operationId: Clusters_Get
       parameters:
       - name: cluster_id
         in: path
@@ -412,7 +412,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClustersServiceGetResponse"
+                $ref: "#/components/schemas/v1ClustersGetResponse"
         default:
           description: An unexpected error response.
           content:
@@ -421,6 +421,23 @@ paths:
                 $ref: "#/components/schemas/rpcStatus"
 components:
   schemas:
+    ClusterOrderState:
+      type: string
+      description: |2-
+         - UNSPECIFIED: Unspecified indicates that the value isn't set.
+         - ACCEPTED: Accepted indicates that the order has been accepted by the system.
+         - REJECTED: Rejected indicates that the order has been rejected by the system.
+         - CANCELED: Rejected indicates that the order has been canceled by the user.
+         - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
+         - FAILED: Failed indicates that fulfillment of the order failed.
+      default: UNSPECIFIED
+      enum:
+      - UNSPECIFIED
+      - ACCEPTED
+      - REJECTED
+      - CANCELED
+      - FULFILLED
+      - FAILED
     protobufAny:
       type: object
       properties:
@@ -467,7 +484,7 @@ components:
             Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster
             templates.
         state:
-          $ref: "#/components/schemas/v1ClusterOrderState"
+          $ref: "#/components/schemas/ClusterOrderState"
         cluster_id:
           type: string
           description: |-
@@ -476,31 +493,14 @@ components:
       description: |-
         A cluster order contains all the details that the user has to provide to request the provisioning of a cluster, as
         well as the details of the status of the fulfillment process.
-    v1ClusterOrderState:
-      type: string
-      description: |2-
-         - UNSPECIFIED: Unspecified indicates that the value isn't set.
-         - ACCEPTED: Accepted indicates that the order has been accepted by the system.
-         - REJECTED: Rejected indicates that the order has been rejected by the system.
-         - CANCELED: Rejected indicates that the order has been canceled by the user.
-         - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
-         - FAILED: Failed indicates that fulfillment of the order failed.
-      default: UNSPECIFIED
-      enum:
-      - UNSPECIFIED
-      - ACCEPTED
-      - REJECTED
-      - CANCELED
-      - FULFILLED
-      - FAILED
-    v1ClusterOrdersServiceCancelResponse:
+    v1ClusterOrdersCancelResponse:
       type: object
-    v1ClusterOrdersServiceGetResponse:
+    v1ClusterOrdersGetResponse:
       type: object
       properties:
         order:
           $ref: "#/components/schemas/v1ClusterOrder"
-    v1ClusterOrdersServiceListResponse:
+    v1ClusterOrdersListResponse:
       type: object
       properties:
         size:
@@ -521,7 +521,7 @@ components:
           description: List of results.
           items:
             $ref: "#/components/schemas/v1ClusterOrder"
-    v1ClusterOrdersServicePlaceResponse:
+    v1ClusterOrdersPlaceResponse:
       type: object
       properties:
         order:
@@ -543,12 +543,12 @@ components:
             \ format."
       description: A cluster template defines a type of cluster that can be ordered
         by the user.
-    v1ClusterTemplatesServiceGetResponse:
+    v1ClusterTemplatesGetResponse:
       type: object
       properties:
         template:
           $ref: "#/components/schemas/v1ClusterTemplate"
-    v1ClusterTemplatesServiceListResponse:
+    v1ClusterTemplatesListResponse:
       type: object
       properties:
         size:
@@ -569,12 +569,12 @@ components:
           description: List of results.
           items:
             $ref: "#/components/schemas/v1ClusterTemplate"
-    v1ClustersServiceGetResponse:
+    v1ClustersGetResponse:
       type: object
       properties:
         cluster:
           $ref: "#/components/schemas/v1Cluster"
-    v1ClustersServiceListResponse:
+    v1ClustersListResponse:
       type: object
       properties:
         size:

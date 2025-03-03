@@ -28,6 +28,7 @@ def yaml() -> str:
             ],
             "except": [
                 "ENUM_VALUE_PREFIX",
+                "SERVICE_SUFFIX",
             ],
             "enum_zero_value_suffix": "UNSPECIFIED",
             "ignore": [
