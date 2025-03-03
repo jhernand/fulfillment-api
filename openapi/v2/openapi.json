@@ -62,7 +62,7 @@
           },
           {
             "name": "filter",
-            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the order instead of the names of the columns of a table. For example, in order to retrieve\nall the orders with state `FULFILLED` the value should be:\n\n    state == 'FULLFILLED'\n\nIf this isn't provided, or if the value is empty, then all the orders that the user has permission to see will be\nreturned.",
+            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the order instead of the names of the columns of a table. For example, in order to retrieve\nall the orders with state `FULFILLED` the value should be:\n\n    state = 'FULLFILLED'\n\nIf this isn't provided, or if the value is empty, then all the orders that the user has permission to see will be\nreturned.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -409,7 +409,7 @@
           },
           {
             "name": "filter",
-            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the event instead of the names of the columns of a table. For example, in order to get only\nthe events of type `CREATED` the value should be:\n\n    type == 'CREATED'\n\nIf this isn't provided, or if the value is empty, then all the events that the user has permission to see will be\nreturned.",
+            "description": "Filter criteria.\n\nThe syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names\nof the attributes of the event instead of the names of the columns of a table. For example, in order to get only\nthe events of type `CREATED` the value should be:\n\n    type = 'CREATED'\n\nIf this isn't provided, or if the value is empty, then all the events that the user has permission to see will be\nreturned.",
             "in": "query",
             "required": false,
             "type": "string"
