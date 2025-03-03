@@ -60,7 +60,6 @@ def openapi() -> None:
         command.run(
             args=[
                 tools.BUF.name, "generate",
-                "--config", buf.yaml(),
                 "--template", buf.gen_yaml(out_dir=v2_tmp_dir),
             ],
             check=True,

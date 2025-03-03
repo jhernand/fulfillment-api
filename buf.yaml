@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #
 # Copyright (c) 2025 Red Hat Inc.
 #
@@ -14,20 +12,21 @@
 # the License.
 #
 
-import logging
+version: v2
 
-import click
+lint:
+  use:
+  - STANDARD
+  except:
+  - ENUM_VALUE_PREFIX
+  - SERVICE_SUFFIX
+  enum_zero_value_suffix: UNSPECIFIED
+  ignore:
+  - proto/google
 
-from . import command
-from . import tools
+breaking:
+  use:
+  - FILE
 
-@click.command()
-def lint() -> None:
-    """
-    Runs the linter.
-    """
-    logging.info(f"Running linter")
-    command.run(
-        args=[tools.BUF.name, "lint"],
-        check=True,
-    )
+modules:
+- path: proto

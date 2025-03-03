@@ -16,37 +16,6 @@
 
 import json
 
-def yaml() -> str:
-    """
-    Generates the content of the 'buf.yaml' file.
-    """
-    return json.dumps({
-        "version": "v2",
-        "lint": {
-            "use": [
-                "STANDARD",
-            ],
-            "except": [
-                "ENUM_VALUE_PREFIX",
-                "SERVICE_SUFFIX",
-            ],
-            "enum_zero_value_suffix": "UNSPECIFIED",
-            "ignore": [
-                "proto/google",
-            ],
-        },
-        "breaking": {
-            "use": [
-                "FILE",
-            ],
-        },
-        "modules": [
-            {
-                "path": "proto",
-            },
-        ],
-    })
-
 def gen_yaml(out_dir: str) -> str:
     """
     Generates the content of the 'buf.gen.yaml' file.
