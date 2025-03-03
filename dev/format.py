@@ -14,8 +14,32 @@
 # the License.
 #
 
-from .format import *
-from .formatter import *
-from .generate import *
-from .lint import *
-from .setup import *
+import click
+
+from . import command
+from . import tools
+
+@click.command()
+@click.option(
+    "--check-only",
+    is_flag=True,
+    help="Check the format, but don't fix it.",
+)
+def format(check_only: bool) -> None:
+    """
+    Formats the source code.
+    """
+    args = [tools.BUF.name, "format"]
+    if check_only:
+        args.extend([
+            "--diff",
+            "--exit-code",
+        ])
+    else:
+        args.extend([
+            "--write",
+        ])
+    command.run(
+        args=args,
+        check=True,
+    )

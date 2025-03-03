@@ -55,6 +55,34 @@ jobs:
         export PATH="../.local/bin:${PATH}"
         ./dev.py lint
 
+  format-code:
+    name: Format source code
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout the source
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Install Python modules
+      run: |
+        pip install -r requirements.txt
+
+    - name: Install tools
+      run: |
+        export PATH="../.local/bin:${PATH}"
+        ./dev.py setup
+
+    - name: Run linter
+      run: |
+        export PATH="../.local/bin:${PATH}"
+        ./dev.py format
+
   check-generated-code:
     name: Check generated code
     runs-on: ubuntu-latest

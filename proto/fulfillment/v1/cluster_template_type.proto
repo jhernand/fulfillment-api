@@ -19,11 +19,11 @@ package fulfillment.v1;
 message ClusterTemplate {
   // Unique identifier of the template.
   string id = 1;
-  
+
   // Human friendly short description of the template, only a few words, suitable for displaying in one single
   // line on a UI or CLI.
   string title = 2;
 
-  // Human friendly long description of the template, using Markdown format. 
+  // Human friendly long description of the template, using Markdown format.
   string description = 3;
 }

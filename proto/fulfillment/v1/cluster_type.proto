@@ -19,10 +19,10 @@ package fulfillment.v1;
 message Cluster {
   // Unique identifier of the cluster.
   string id = 1;
-  
+
   // URL of te API server of the cluster.
   string api_url = 2;
-  
+
   // URL of the console of the cluster.
   string console_url = 3;
 }

@@ -15,9 +15,8 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
-import "google/api/annotations.proto";
-
 import "fulfillment/v1/cluster_order_type.proto";
+import "google/api/annotations.proto";
 
 message ClusterOrdersListRequest {
   // Index of the first result. If not specified the default value will be zero.
@@ -29,7 +28,7 @@ message ClusterOrdersListRequest {
   optional int32 limit = 2;
 
   // Filter criteria.
-  // 
+  //
   // The syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names
   // of the attributes of the order instead of the names of the columns of a table. For example, in order to retrieve
   // all the orders with state `FULFILLED` the value should be:
@@ -86,35 +85,26 @@ message ClusterOrdersCancelRequest {
   string order_id = 1;
 }
 
-message ClusterOrdersCancelResponse {
-}
+message ClusterOrdersCancelResponse {}
 
 service ClusterOrders {
   // Retrieves the list of cluster orders.
   rpc List(ClusterOrdersListRequest) returns (ClusterOrdersListResponse) {
-    option (google.api.http) = {
-      get: "/api/fulfilment/v1/cluster_orders"
-    };
+    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_orders"};
   }
 
   // Retrieves the details of one specific cluster order.
   rpc Get(ClusterOrdersGetRequest) returns (ClusterOrdersGetResponse) {
-    option (google.api.http) = {
-      get: "/api/fulfilment/v1/cluster_orders/{order_id}"
-    };
+    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_orders/{order_id}"};
   }
-  
+
   // Places a new cluster order.
   rpc Place(ClusterOrdersPlaceRequest) returns (ClusterOrdersPlaceResponse) {
-    option (google.api.http) = {
-      post: "/api/fulfilment/v1/cluster_orders"
-    };
+    option (google.api.http) = {post: "/api/fulfilment/v1/cluster_orders"};
   }
 
   // Cancels a cluster order.
   rpc Cancel(ClusterOrdersCancelRequest) returns (ClusterOrdersCancelResponse) {
-    option (google.api.http) = {
-      delete: "/api/fulfilment/v1/cluster_orders/{order_id}"
-    };
+    option (google.api.http) = {delete: "/api/fulfilment/v1/cluster_orders/{order_id}"};
   }
 }

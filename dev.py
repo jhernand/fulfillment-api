@@ -34,6 +34,7 @@ def cli():
     pass
 
 # Add the commands:
+cli.add_command(dev.format)
 cli.add_command(dev.generate)
 cli.add_command(dev.lint)
 cli.add_command(dev.setup)

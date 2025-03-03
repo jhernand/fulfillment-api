@@ -18,7 +18,6 @@ package fulfillment.v1;
 // A cluster order contains all the details that the user has to provide to request the provisioning of a cluster, as
 // well as the details of the status of the fulfillment process.
 message ClusterOrder {
-
   enum State {
     // Unspecified indicates that the value isn't set.
     UNSPECIFIED = 0;

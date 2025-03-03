@@ -15,9 +15,8 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
-import "google/api/annotations.proto";
-
 import "fulfillment/v1/cluster_template_type.proto";
+import "google/api/annotations.proto";
 
 message ClusterTemplatesListRequest {
   // Index of the first result. If not specified the default value will be zero.
@@ -29,7 +28,7 @@ message ClusterTemplatesListRequest {
   optional int32 limit = 2;
 
   // Filter criteria.
-  // 
+  //
   // The syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names
   // of the attributes of the template instead of the names of the columns of a table. For example, in order to retrieve
   // all the templates with a title starting with `large` the value should be:
@@ -77,15 +76,11 @@ message ClusterTemplatesGetResponse {
 service ClusterTemplates {
   // Retrieves the list of cluster templates.
   rpc List(ClusterTemplatesListRequest) returns (ClusterTemplatesListResponse) {
-    option (google.api.http) = {
-      get: "/api/fulfilment/v1/cluster_templates"
-    };
+    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_templates"};
   }
 
   // Retrieves the details of one specific cluster template.
   rpc Get(ClusterTemplatesGetRequest) returns (ClusterTemplatesGetResponse) {
-    option (google.api.http) = {
-      get: "/api/fulfilment/v1/cluster_templates/{template_id}"
-    };
+    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_templates/{template_id}"};
   }
 }
