@@ -32,7 +32,7 @@ message EventsWatchRequest {
   // of the attributes of the event instead of the names of the columns of a table. For example, in order to get only
   // the events of type `CREATED` the value should be:
   //
-  //     type == 'CREATED'
+  //     type = 'CREATED'
   //
   // If this isn't provided, or if the value is empty, then all the events that the user has permission to see will be
   // returned.
