@@ -1,0 +1,110 @@
+//
+// Copyright (c) 2025 Red Hat, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+// the License. You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
+//
+
+syntax = "proto3";
+
+package fulfillment.v1;
+
+import "fulfillment/v1/cluster_order_type.proto";
+import "google/api/annotations.proto";
+
+message ClusterOrdersListRequest {
+  // Index of the first result. If not specified the default value will be zero.
+  optional int32 offset = 1;
+
+  // Maximum number of results to be returned by the server. When not specified all the results will be returned. Note
+  // that there may not be enough results to return, and that the server may decide, for performance reasons, to return
+  // less results than requested.
+  optional int32 limit = 2;
+
+  // Filter criteria.
+  //
+  // The syntax of this parameter is similar to the syntax of the _where_ clause of a SQL statement, but using the names
+  // of the attributes of the order instead of the names of the columns of a table. For example, in order to retrieve
+  // all the orders with state `FULFILLED` the value should be:
+  //
+  //     state = 'FULLFILLED'
+  //
+  // If this isn't provided, or if the value is empty, then all the orders that the user has permission to see will be
+  // returned.
+  optional string filter = 3;
+
+  // Order criteria.
+  //
+  // The syntax of this parameter is similar to the syntax of the _order by_ clause of a SQL statement, but using the
+  // names of the attributes of the order instead of the names of the columns of a table. For example, in order to sort
+  // the orders descending by state the value should be:
+  //
+  //     state desc
+  //
+  // If the parameter isn't provided, or if the value is empty, then the order of the results is undefined.
+  optional string order = 4;
+}
+
+message ClusterOrdersListResponse {
+  // Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
+  // of the request if there are not enough items, or of the system decides that returning that number of items isn't
+  // feasible or convenient for performance reasons.
+  optional int32 size = 3;
+
+  // Total number of items of the collection that match the search criteria, regardless of the number of results
+  // requested with the `limit` parameter.
+  optional int32 total = 4;
+
+  // List of results.
+  repeated ClusterOrder items = 5;
+}
+
+message ClusterOrdersGetRequest {
+  string order_id = 1;
+}
+
+message ClusterOrdersGetResponse {
+  ClusterOrder order = 1;
+}
+
+message ClusterOrdersPlaceRequest {
+  ClusterOrder order = 1;
+}
+
+message ClusterOrdersPlaceResponse {
+  ClusterOrder order = 1;
+}
+
+message ClusterOrdersCancelRequest {
+  string order_id = 1;
+}
+
+message ClusterOrdersCancelResponse {}
+
+service ClusterOrders {
+  // Retrieves the list of cluster orders.
+  rpc List(ClusterOrdersListRequest) returns (ClusterOrdersListResponse) {
+    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_orders"};
+  }
+
+  // Retrieves the details of one specific cluster order.
+  rpc Get(ClusterOrdersGetRequest) returns (ClusterOrdersGetResponse) {
+    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_orders/{order_id}"};
+  }
+
+  // Places a new cluster order.
+  rpc Place(ClusterOrdersPlaceRequest) returns (ClusterOrdersPlaceResponse) {
+    option (google.api.http) = {post: "/api/fulfilment/v1/cluster_orders"};
+  }
+
+  // Cancels a cluster order.
+  rpc Cancel(ClusterOrdersCancelRequest) returns (ClusterOrdersCancelResponse) {
+    option (google.api.http) = {delete: "/api/fulfilment/v1/cluster_orders/{order_id}"};
+  }
+}
