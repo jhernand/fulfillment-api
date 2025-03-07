@@ -95,4 +95,3 @@ def openapi() -> None:
         shutil.move(v3_tmp_file, v3_file)
     finally:
         shutil.rmtree(tmp_dir)
-
