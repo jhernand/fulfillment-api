@@ -15,11 +15,24 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
-// A cluster contains the details of a cluster that has already been completely provisioned.
+// A cluster contains the details of the cluster. The spec contains the desired details, and man be modified by the
+// user.The status contains the current status of the cluster, is provided by the system and can't be modified by the
+// user.
 message Cluster {
   // Unique identifier of the cluster.
   string id = 1;
 
+  ClusterSpec spec = 2;
+  ClusterStatus status = 3;
+}
+
+// The spec contains the details of a cluster as desired by the user. Note that currently this is empty because all the
+// details of the cluster are provided by the system.
+message ClusterSpec {
+}
+
+// The status contains the details of the cluster provided by the system.
+message ClusterStatus {
   // URL of te API server of the cluster.
   string api_url = 2;
 

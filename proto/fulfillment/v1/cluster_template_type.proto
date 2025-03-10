@@ -15,7 +15,8 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
-// A cluster template defines a type of cluster that can be ordered by the user.
+// A cluster template defines a type of cluster that can be ordered by the user. Note that the user doesn't create these
+// templates: the system provides a collection of them, and the user chooses one.
 message ClusterTemplate {
   // Unique identifier of the template.
   string id = 1;
