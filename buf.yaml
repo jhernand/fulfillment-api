@@ -18,9 +18,7 @@ lint:
   use:
   - STANDARD
   except:
-  - ENUM_VALUE_PREFIX
   - SERVICE_SUFFIX
-  enum_zero_value_suffix: UNSPECIFIED
   ignore:
   - proto/google
   - proto/protoc-gen-openapiv2

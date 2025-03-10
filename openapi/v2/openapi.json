@@ -124,19 +124,19 @@
           },
           {
             "name": "order.state",
-            "description": "State indicates the current state of the processing of the order.\n\n - UNSPECIFIED: Unspecified indicates that the value isn't set.\n - ACCEPTED: Accepted indicates that the order has been accepted by the system.\n - REJECTED: Rejected indicates that the order has been rejected by the system.\n - CANCELED: Rejected indicates that the order has been canceled by the user.\n - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.\n - FAILED: Failed indicates that fulfillment of the order failed.",
+            "description": "State indicates the current state of the processing of the order.\n\n - CLUSTER_ORDER_STATE_UNSPECIFIED: Unspecified indicates that the value isn't set.\n - CLUSTER_ORDER_STATE_ACCEPTED: Accepted indicates that the order has been accepted by the system.\n - CLUSTER_ORDER_STATE_REJECTED: Rejected indicates that the order has been rejected by the system.\n - CLUSTER_ORDER_STATE_CANCELED: Canceled indicates that the order has been canceled by the user.\n - CLUSTER_ORDER_STATE_FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.\n - CLUSTER_ORDER_STATE_FAILED: Failed indicates that fulfillment of the order failed.",
             "in": "query",
             "required": false,
             "type": "string",
             "enum": [
-              "UNSPECIFIED",
-              "ACCEPTED",
-              "REJECTED",
-              "CANCELED",
-              "FULFILLED",
-              "FAILED"
+              "CLUSTER_ORDER_STATE_UNSPECIFIED",
+              "CLUSTER_ORDER_STATE_ACCEPTED",
+              "CLUSTER_ORDER_STATE_REJECTED",
+              "CLUSTER_ORDER_STATE_CANCELED",
+              "CLUSTER_ORDER_STATE_FULFILLED",
+              "CLUSTER_ORDER_STATE_FAILED"
             ],
-            "default": "UNSPECIFIED"
+            "default": "CLUSTER_ORDER_STATE_UNSPECIFIED"
           },
           {
             "name": "order.cluster_id",
@@ -433,19 +433,6 @@
     }
   },
   "definitions": {
-    "ClusterOrderState": {
-      "type": "string",
-      "enum": [
-        "UNSPECIFIED",
-        "ACCEPTED",
-        "REJECTED",
-        "CANCELED",
-        "FULFILLED",
-        "FAILED"
-      ],
-      "default": "UNSPECIFIED",
-      "description": " - UNSPECIFIED: Unspecified indicates that the value isn't set.\n - ACCEPTED: Accepted indicates that the order has been accepted by the system.\n - REJECTED: Rejected indicates that the order has been rejected by the system.\n - CANCELED: Rejected indicates that the order has been canceled by the user.\n - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.\n - FAILED: Failed indicates that fulfillment of the order failed."
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -506,7 +493,7 @@
           "description": "Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster\ntemplates."
         },
         "state": {
-          "$ref": "#/definitions/ClusterOrderState",
+          "$ref": "#/definitions/v1ClusterOrderState",
           "description": "State indicates the current state of the processing of the order."
         },
         "cluster_id": {
@@ -515,6 +502,19 @@
         }
       },
       "description": "A cluster order contains all the details that the user has to provide to request the provisioning of a cluster, as\nwell as the details of the status of the fulfillment process."
+    },
+    "v1ClusterOrderState": {
+      "type": "string",
+      "enum": [
+        "CLUSTER_ORDER_STATE_UNSPECIFIED",
+        "CLUSTER_ORDER_STATE_ACCEPTED",
+        "CLUSTER_ORDER_STATE_REJECTED",
+        "CLUSTER_ORDER_STATE_CANCELED",
+        "CLUSTER_ORDER_STATE_FULFILLED",
+        "CLUSTER_ORDER_STATE_FAILED"
+      ],
+      "default": "CLUSTER_ORDER_STATE_UNSPECIFIED",
+      "description": " - CLUSTER_ORDER_STATE_UNSPECIFIED: Unspecified indicates that the value isn't set.\n - CLUSTER_ORDER_STATE_ACCEPTED: Accepted indicates that the order has been accepted by the system.\n - CLUSTER_ORDER_STATE_REJECTED: Rejected indicates that the order has been rejected by the system.\n - CLUSTER_ORDER_STATE_CANCELED: Canceled indicates that the order has been canceled by the user.\n - CLUSTER_ORDER_STATE_FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.\n - CLUSTER_ORDER_STATE_FAILED: Failed indicates that fulfillment of the order failed."
     },
     "v1ClusterOrdersCancelResponse": {
       "type": "object"
@@ -663,13 +663,13 @@
     "v1EventType": {
       "type": "string",
       "enum": [
-        "UNSPECIFIED",
-        "CREATE",
-        "UPDATE",
-        "DELETE"
+        "EVENT_TYPE_UNSPECIFIED",
+        "EVENT_TYPE_CREATE",
+        "EVENT_TYPE_UPDATE",
+        "EVENT_TYPE_DELETE"
       ],
-      "default": "UNSPECIFIED",
-      "description": " - UNSPECIFIED: Unspecified indicates that the type of event hasn't been specified.\n - CREATE: Create indicates that a new object has been created. The `new` field will contain the represenation of that\nobject. The `old` field will be empty.\n - UPDATE: Update indicates that an existing object has been updated. The `old` and `new` fields will contain the\nrepresentations of the object before and after the update.\n - DELETE: Delete indicates that an object has been deleted. The `old` field will contain the representation of the object\nright before it was deleted. The `new` field will be empty."
+      "default": "EVENT_TYPE_UNSPECIFIED",
+      "description": " - EVENT_TYPE_UNSPECIFIED: Unspecified indicates that the type of event hasn't been specified.\n - EVENT_TYPE_CREATE: Create indicates that a new object has been created. The `new` field will contain the represenation of that\nobject. The `old` field will be empty.\n - EVENT_TYPE_UPDATE: Update indicates that an existing object has been updated. The `old` and `new` fields will contain the\nrepresentations of the object before and after the update.\n - EVENT_TYPE_DELETE: Delete indicates that an object has been deleted. The `old` field will contain the representation of the object\nright before it was deleted. The `new` field will be empty."
     },
     "v1EventsWatchResponse": {
       "type": "object",

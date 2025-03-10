@@ -123,25 +123,25 @@ paths:
         description: |-
           State indicates the current state of the processing of the order.
 
-           - UNSPECIFIED: Unspecified indicates that the value isn't set.
-           - ACCEPTED: Accepted indicates that the order has been accepted by the system.
-           - REJECTED: Rejected indicates that the order has been rejected by the system.
-           - CANCELED: Rejected indicates that the order has been canceled by the user.
-           - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
-           - FAILED: Failed indicates that fulfillment of the order failed.
+           - CLUSTER_ORDER_STATE_UNSPECIFIED: Unspecified indicates that the value isn't set.
+           - CLUSTER_ORDER_STATE_ACCEPTED: Accepted indicates that the order has been accepted by the system.
+           - CLUSTER_ORDER_STATE_REJECTED: Rejected indicates that the order has been rejected by the system.
+           - CLUSTER_ORDER_STATE_CANCELED: Canceled indicates that the order has been canceled by the user.
+           - CLUSTER_ORDER_STATE_FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
+           - CLUSTER_ORDER_STATE_FAILED: Failed indicates that fulfillment of the order failed.
         required: false
         style: form
         explode: true
         schema:
           type: string
-          default: UNSPECIFIED
+          default: CLUSTER_ORDER_STATE_UNSPECIFIED
           enum:
-          - UNSPECIFIED
-          - ACCEPTED
-          - REJECTED
-          - CANCELED
-          - FULFILLED
-          - FAILED
+          - CLUSTER_ORDER_STATE_UNSPECIFIED
+          - CLUSTER_ORDER_STATE_ACCEPTED
+          - CLUSTER_ORDER_STATE_REJECTED
+          - CLUSTER_ORDER_STATE_CANCELED
+          - CLUSTER_ORDER_STATE_FULFILLED
+          - CLUSTER_ORDER_STATE_FAILED
       - name: order.cluster_id
         in: query
         description: |-
@@ -479,23 +479,6 @@ paths:
                 $ref: "#/components/schemas/rpcStatus"
 components:
   schemas:
-    ClusterOrderState:
-      type: string
-      description: |2-
-         - UNSPECIFIED: Unspecified indicates that the value isn't set.
-         - ACCEPTED: Accepted indicates that the order has been accepted by the system.
-         - REJECTED: Rejected indicates that the order has been rejected by the system.
-         - CANCELED: Rejected indicates that the order has been canceled by the user.
-         - FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
-         - FAILED: Failed indicates that fulfillment of the order failed.
-      default: UNSPECIFIED
-      enum:
-      - UNSPECIFIED
-      - ACCEPTED
-      - REJECTED
-      - CANCELED
-      - FULFILLED
-      - FAILED
     protobufAny:
       type: object
       properties:
@@ -657,7 +640,7 @@ components:
             Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster
             templates.
         state:
-          $ref: "#/components/schemas/ClusterOrderState"
+          $ref: "#/components/schemas/v1ClusterOrderState"
         cluster_id:
           type: string
           description: |-
@@ -666,6 +649,23 @@ components:
       description: |-
         A cluster order contains all the details that the user has to provide to request the provisioning of a cluster, as
         well as the details of the status of the fulfillment process.
+    v1ClusterOrderState:
+      type: string
+      description: |2-
+         - CLUSTER_ORDER_STATE_UNSPECIFIED: Unspecified indicates that the value isn't set.
+         - CLUSTER_ORDER_STATE_ACCEPTED: Accepted indicates that the order has been accepted by the system.
+         - CLUSTER_ORDER_STATE_REJECTED: Rejected indicates that the order has been rejected by the system.
+         - CLUSTER_ORDER_STATE_CANCELED: Canceled indicates that the order has been canceled by the user.
+         - CLUSTER_ORDER_STATE_FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
+         - CLUSTER_ORDER_STATE_FAILED: Failed indicates that fulfillment of the order failed.
+      default: CLUSTER_ORDER_STATE_UNSPECIFIED
+      enum:
+      - CLUSTER_ORDER_STATE_UNSPECIFIED
+      - CLUSTER_ORDER_STATE_ACCEPTED
+      - CLUSTER_ORDER_STATE_REJECTED
+      - CLUSTER_ORDER_STATE_CANCELED
+      - CLUSTER_ORDER_STATE_FULFILLED
+      - CLUSTER_ORDER_STATE_FAILED
     v1ClusterOrdersCancelResponse:
       type: object
     v1ClusterOrdersGetResponse:
@@ -789,19 +789,19 @@ components:
     v1EventType:
       type: string
       description: |2-
-         - UNSPECIFIED: Unspecified indicates that the type of event hasn't been specified.
-         - CREATE: Create indicates that a new object has been created. The `new` field will contain the represenation of that
+         - EVENT_TYPE_UNSPECIFIED: Unspecified indicates that the type of event hasn't been specified.
+         - EVENT_TYPE_CREATE: Create indicates that a new object has been created. The `new` field will contain the represenation of that
         object. The `old` field will be empty.
-         - UPDATE: Update indicates that an existing object has been updated. The `old` and `new` fields will contain the
+         - EVENT_TYPE_UPDATE: Update indicates that an existing object has been updated. The `old` and `new` fields will contain the
         representations of the object before and after the update.
-         - DELETE: Delete indicates that an object has been deleted. The `old` field will contain the representation of the object
+         - EVENT_TYPE_DELETE: Delete indicates that an object has been deleted. The `old` field will contain the representation of the object
         right before it was deleted. The `new` field will be empty.
-      default: UNSPECIFIED
+      default: EVENT_TYPE_UNSPECIFIED
       enum:
-      - UNSPECIFIED
-      - CREATE
-      - UPDATE
-      - DELETE
+      - EVENT_TYPE_UNSPECIFIED
+      - EVENT_TYPE_CREATE
+      - EVENT_TYPE_UPDATE
+      - EVENT_TYPE_DELETE
     v1EventsWatchResponse:
       type: object
       properties:
