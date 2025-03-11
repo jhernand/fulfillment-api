@@ -98,60 +98,12 @@ paths:
       - ClusterOrders
       summary: Places a new cluster order.
       operationId: ClusterOrders_Place
-      parameters:
-      - name: order.id
-        in: query
-        description: Unique identifier of the order. This will be automatically generated
-          by the system when the order is placed.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: order.template_id
-        in: query
-        description: |-
-          Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster
-          templates.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: order.state
-        in: query
-        description: |-
-          State indicates the current state of the processing of the order.
-
-           - CLUSTER_ORDER_STATE_UNSPECIFIED: Unspecified indicates that the value isn't set.
-           - CLUSTER_ORDER_STATE_ACCEPTED: Accepted indicates that the order has been accepted by the system.
-           - CLUSTER_ORDER_STATE_REJECTED: Rejected indicates that the order has been rejected by the system.
-           - CLUSTER_ORDER_STATE_CANCELED: Canceled indicates that the order has been canceled by the user.
-           - CLUSTER_ORDER_STATE_FULFILLED: Fulfilled indicates that the order has been successfully fulfilled.
-           - CLUSTER_ORDER_STATE_FAILED: Failed indicates that fulfillment of the order failed.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          default: CLUSTER_ORDER_STATE_UNSPECIFIED
-          enum:
-          - CLUSTER_ORDER_STATE_UNSPECIFIED
-          - CLUSTER_ORDER_STATE_ACCEPTED
-          - CLUSTER_ORDER_STATE_REJECTED
-          - CLUSTER_ORDER_STATE_CANCELED
-          - CLUSTER_ORDER_STATE_FULFILLED
-          - CLUSTER_ORDER_STATE_FAILED
-      - name: order.cluster_id
-        in: query
-        description: |-
-          Reference to the resulting cluster. This will be automatically populated by the system when the requested cluster
-          is completely provisoned. Further details about the cluster, like the API URL, will be available there.
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/v1ClusterOrdersPlaceRequest"
+        required: true
       responses:
         "200":
           description: A successful response.
@@ -165,6 +117,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
+      x-codegen-request-body-name: body
   /api/fulfillment/v1/cluster_orders/{order_id}:
     get:
       tags:
@@ -694,6 +647,11 @@ components:
           description: List of results.
           items:
             $ref: "#/components/schemas/v1ClusterOrder"
+    v1ClusterOrdersPlaceRequest:
+      type: object
+      properties:
+        order:
+          $ref: "#/components/schemas/v1ClusterOrder"
     v1ClusterOrdersPlaceResponse:
       type: object
       properties:
