@@ -90,21 +90,21 @@ message ClusterOrdersCancelResponse {}
 service ClusterOrders {
   // Retrieves the list of cluster orders.
   rpc List(ClusterOrdersListRequest) returns (ClusterOrdersListResponse) {
-    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_orders"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/cluster_orders"};
   }
 
   // Retrieves the details of one specific cluster order.
   rpc Get(ClusterOrdersGetRequest) returns (ClusterOrdersGetResponse) {
-    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_orders/{order_id}"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/cluster_orders/{order_id}"};
   }
 
   // Places a new cluster order.
   rpc Place(ClusterOrdersPlaceRequest) returns (ClusterOrdersPlaceResponse) {
-    option (google.api.http) = {post: "/api/fulfilment/v1/cluster_orders"};
+    option (google.api.http) = {post: "/api/fulfillment/v1/cluster_orders"};
   }
 
   // Cancels a cluster order.
   rpc Cancel(ClusterOrdersCancelRequest) returns (ClusterOrdersCancelResponse) {
-    option (google.api.http) = {delete: "/api/fulfilment/v1/cluster_orders/{order_id}"};
+    option (google.api.http) = {delete: "/api/fulfillment/v1/cluster_orders/{order_id}"};
   }
 }

@@ -16,7 +16,7 @@ tags:
 - name: Clusters
 - name: Events
 paths:
-  /api/fulfilment/v1/cluster_orders:
+  /api/fulfillment/v1/cluster_orders:
     get:
       tags:
       - ClusterOrders
@@ -165,7 +165,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfilment/v1/cluster_orders/{order_id}:
+  /api/fulfillment/v1/cluster_orders/{order_id}:
     get:
       tags:
       - ClusterOrders
@@ -218,7 +218,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfilment/v1/cluster_templates:
+  /api/fulfillment/v1/cluster_templates:
     get:
       tags:
       - ClusterTemplates
@@ -295,7 +295,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfilment/v1/cluster_templates/{template_id}:
+  /api/fulfillment/v1/cluster_templates/{template_id}:
     get:
       tags:
       - ClusterTemplates
@@ -322,7 +322,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfilment/v1/clusters:
+  /api/fulfillment/v1/clusters:
     get:
       tags:
       - Clusters
@@ -399,7 +399,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfilment/v1/clusters/{cluster_id}:
+  /api/fulfillment/v1/clusters/{cluster_id}:
     get:
       tags:
       - Clusters
@@ -426,7 +426,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfilment/v1/events:
+  /api/fulfillment/v1/events:
     get:
       tags:
       - Events

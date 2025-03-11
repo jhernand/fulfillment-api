@@ -46,6 +46,6 @@ message EventsWatchResponse {
 service Events {
   // Watches events.
   rpc Watch(EventsWatchRequest) returns (stream EventsWatchResponse) {
-    option (google.api.http) = {get: "/api/fulfilment/v1/events"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/events"};
   }
 }

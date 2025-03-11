@@ -76,11 +76,11 @@ message ClustersGetResponse {
 service Clusters {
   // Retrieves the list of clusters.
   rpc List(ClustersListRequest) returns (ClustersListResponse) {
-    option (google.api.http) = {get: "/api/fulfilment/v1/clusters"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/clusters"};
   }
 
   // Retrieves the details of one specific cluster.
   rpc Get(ClustersGetRequest) returns (ClustersGetResponse) {
-    option (google.api.http) = {get: "/api/fulfilment/v1/clusters/{cluster_id}"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/clusters/{cluster_id}"};
   }
 }

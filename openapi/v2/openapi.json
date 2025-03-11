@@ -36,7 +36,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/fulfilment/v1/cluster_orders": {
+    "/api/fulfillment/v1/cluster_orders": {
       "get": {
         "summary": "Retrieves the list of cluster orders.",
         "operationId": "ClusterOrders_List",
@@ -151,7 +151,7 @@
         ]
       }
     },
-    "/api/fulfilment/v1/cluster_orders/{order_id}": {
+    "/api/fulfillment/v1/cluster_orders/{order_id}": {
       "get": {
         "summary": "Retrieves the details of one specific cluster order.",
         "operationId": "ClusterOrders_Get",
@@ -211,7 +211,7 @@
         ]
       }
     },
-    "/api/fulfilment/v1/cluster_templates": {
+    "/api/fulfillment/v1/cluster_templates": {
       "get": {
         "summary": "Retrieves the list of cluster templates.",
         "operationId": "ClusterTemplates_List",
@@ -266,7 +266,7 @@
         ]
       }
     },
-    "/api/fulfilment/v1/cluster_templates/{template_id}": {
+    "/api/fulfillment/v1/cluster_templates/{template_id}": {
       "get": {
         "summary": "Retrieves the details of one specific cluster template.",
         "operationId": "ClusterTemplates_Get",
@@ -297,7 +297,7 @@
         ]
       }
     },
-    "/api/fulfilment/v1/clusters": {
+    "/api/fulfillment/v1/clusters": {
       "get": {
         "summary": "Retrieves the list of clusters.",
         "operationId": "Clusters_List",
@@ -352,7 +352,7 @@
         ]
       }
     },
-    "/api/fulfilment/v1/clusters/{cluster_id}": {
+    "/api/fulfillment/v1/clusters/{cluster_id}": {
       "get": {
         "summary": "Retrieves the details of one specific cluster.",
         "operationId": "Clusters_Get",
@@ -383,7 +383,7 @@
         ]
       }
     },
-    "/api/fulfilment/v1/events": {
+    "/api/fulfillment/v1/events": {
       "get": {
         "summary": "Watches events.",
         "operationId": "Events_Watch",

@@ -76,11 +76,11 @@ message ClusterTemplatesGetResponse {
 service ClusterTemplates {
   // Retrieves the list of cluster templates.
   rpc List(ClusterTemplatesListRequest) returns (ClusterTemplatesListResponse) {
-    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_templates"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/cluster_templates"};
   }
 
   // Retrieves the details of one specific cluster template.
   rpc Get(ClusterTemplatesGetRequest) returns (ClusterTemplatesGetResponse) {
-    option (google.api.http) = {get: "/api/fulfilment/v1/cluster_templates/{template_id}"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/cluster_templates/{template_id}"};
   }
 }
