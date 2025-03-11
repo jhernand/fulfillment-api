@@ -100,7 +100,10 @@ service ClusterOrders {
 
   // Places a new cluster order.
   rpc Place(ClusterOrdersPlaceRequest) returns (ClusterOrdersPlaceResponse) {
-    option (google.api.http) = {post: "/api/fulfillment/v1/cluster_orders"};
+    option (google.api.http) = {
+      post: "/api/fulfillment/v1/cluster_orders"
+      body: "*"
+    };
   }
 
   // Cancels a cluster order.
