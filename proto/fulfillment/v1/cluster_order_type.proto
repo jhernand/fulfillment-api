@@ -15,6 +15,8 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
+import "google/protobuf/any.proto";
+
 // A cluster order contains the details that the user provides to request the provisioning of a cluster, as well as the
 // current status of the order provided by the system.
 message ClusterOrder {
@@ -29,7 +31,10 @@ message ClusterOrder {
 message ClusterOrderSpec {
   // Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster
   // templates.
-  string template_id = 2;
+  string template_id = 1;
+
+  // Values of the template parameters.
+  map<string, google.protobuf.Any> template_parameters = 2;
 }
 
 // The status contains the current status of the order.
