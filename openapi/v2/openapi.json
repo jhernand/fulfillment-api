@@ -472,6 +472,13 @@
         "template_id": {
           "type": "string",
           "description": "Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster\ntemplates."
+        },
+        "template_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufAny"
+          },
+          "description": "Values of the template parameters."
         }
       },
       "description": "The spec contains the details that the user provides to request the provisioning of the cluster."
@@ -585,9 +592,43 @@
         "description": {
           "type": "string",
           "description": "Human friendly long description of the template, using Markdown format."
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1ClusterTemplateParameterDefinition"
+          },
+          "description": "Definitions of the parameters that can be used to customize the template.\n\nNote that these are only the *definitions* of the parameters, not the actual values. The actual values are in the\n`spec.template_parameters` field of the cluster order."
         }
       },
       "description": "A cluster template defines a type of cluster that can be ordered by the user. Note that the user doesn't create these\ntemplates: the system provides a collection of them, and the user chooses one."
+    },
+    "v1ClusterTemplateParameterDefinition": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Human friendly short description of the parameter, only a few words, suitable for displaying in one single line on\na UI or CLI."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human friendly description of the parameter, using Markdown format."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Indicates if this parameter is required or optional.\n\nValues for required parameters must be included when sending the order, otherwise it will be rejected.\n\nNote that there may be other dependencies between parameters which may cause a order to be rejected. For example,\nthe allowed values of a parameter may depend on the value of another parameter. That kind of information will be in\nthe `description` field."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the parameter.\n\nThe format is the same used by the `type_url` field of the `Any` type. For example, for an integer parameter the\nit will be `type.googleapis.com/google.protobuf.Int32Value`."
+        },
+        "default": {
+          "type": "string",
+          "format": "byte",
+          "description": "Default value for optional parameters.\n\nThis is a serialized representation of the default value. To reconstruct you can create an instance of the `Any`\ntype using this and the type. For example, in Go, if the value was the integer 42, the serialized value would be\n8 and 42. It could be converted back to an integer like this:\n\n    defaultType := \"type.googleapis.com/google.protobuf.Int32Value\"\n    defaultValue := []byte{8, 42}\n    defaultAny := \u0026anypb.Any{\n            TypeUrl: defaultType,\n            Value:   defaultValue,\n    }\n    defaultInt := \u0026wrapperspb.Int32Value{}\n    err := defaultAny.UnmarshalTo(defaultInt)\n    if err != nil {\n            panic(err)\n    }\n    fmt.Printf(\"%d\\n\", defaultInt.Value)\n\nWhen converted to JSON this will be use the corresponding JSON type, for example:\n\n   {\n     \"id\": \"123\",\n     \"title\": \"my_template\",\n     \"description\": \"My template\",\n     \"parameters\": {\n       \"my_parameter\": {\n         \"description\": \"My parameter\",\n         \"required\": false,\n         \"type\": \"type.googleapis.com/google.protobuf.Int32Value\",\n         \"value\": 42\n       }\n     }\n   }\n }"
+        }
+      },
+      "description": "Contains type and documentation of a template parameter."
     },
     "v1ClusterTemplatesGetResponse": {
       "type": "object",

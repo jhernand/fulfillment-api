@@ -602,6 +602,11 @@ components:
           description: |-
             Reference to the cluster template. This is mandatory, and must be the value of the `id` field of one of the cluster
             templates.
+        template_parameters:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/protobufAny"
+          description: Values of the template parameters.
       description: The spec contains the details that the user provides to request
         the provisioning of the cluster.
     v1ClusterOrderState:
@@ -704,9 +709,88 @@ components:
           type: string
           description: "Human friendly long description of the template, using Markdown\
             \ format."
+        parameters:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/v1ClusterTemplateParameterDefinition"
+          description: |-
+            Definitions of the parameters that can be used to customize the template.
+
+            Note that these are only the *definitions* of the parameters, not the actual values. The actual values are in the
+            `spec.template_parameters` field of the cluster order.
       description: |-
         A cluster template defines a type of cluster that can be ordered by the user. Note that the user doesn't create these
         templates: the system provides a collection of them, and the user chooses one.
+    v1ClusterTemplateParameterDefinition:
+      type: object
+      properties:
+        title:
+          type: string
+          description: |-
+            Human friendly short description of the parameter, only a few words, suitable for displaying in one single line on
+            a UI or CLI.
+        description:
+          type: string
+          description: "Human friendly description of the parameter, using Markdown\
+            \ format."
+        required:
+          type: boolean
+          description: |-
+            Indicates if this parameter is required or optional.
+
+            Values for required parameters must be included when sending the order, otherwise it will be rejected.
+
+            Note that there may be other dependencies between parameters which may cause a order to be rejected. For example,
+            the allowed values of a parameter may depend on the value of another parameter. That kind of information will be in
+            the `description` field.
+        type:
+          type: string
+          description: |-
+            Type of the parameter.
+
+            The format is the same used by the `type_url` field of the `Any` type. For example, for an integer parameter the
+            it will be `type.googleapis.com/google.protobuf.Int32Value`.
+        default:
+          pattern: "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+          type: string
+          description: |-
+            Default value for optional parameters.
+
+            This is a serialized representation of the default value. To reconstruct you can create an instance of the `Any`
+            type using this and the type. For example, in Go, if the value was the integer 42, the serialized value would be
+            8 and 42. It could be converted back to an integer like this:
+
+                defaultType := "type.googleapis.com/google.protobuf.Int32Value"
+                defaultValue := []byte{8, 42}
+                defaultAny := &anypb.Any{
+                        TypeUrl: defaultType,
+                        Value:   defaultValue,
+                }
+                defaultInt := &wrapperspb.Int32Value{}
+                err := defaultAny.UnmarshalTo(defaultInt)
+                if err != nil {
+                        panic(err)
+                }
+                fmt.Printf("%d\n", defaultInt.Value)
+
+            When converted to JSON this will be use the corresponding JSON type, for example:
+
+               {
+                 "id": "123",
+                 "title": "my_template",
+                 "description": "My template",
+                 "parameters": {
+                   "my_parameter": {
+                     "description": "My parameter",
+                     "required": false,
+                     "type": "type.googleapis.com/google.protobuf.Int32Value",
+                     "value": 42
+                   }
+                 }
+               }
+             }
+          format: byte
+      description: Contains type and documentation of a template parameter.
     v1ClusterTemplatesGetResponse:
       type: object
       properties:
