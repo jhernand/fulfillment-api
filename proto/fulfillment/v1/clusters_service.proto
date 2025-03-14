@@ -17,6 +17,7 @@ package fulfillment.v1;
 
 import "fulfillment/v1/cluster_type.proto";
 import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
 
 message ClustersListRequest {
   // Index of the first result. If not specified the default value will be zero.
@@ -73,6 +74,18 @@ message ClustersGetResponse {
   Cluster cluster = 1;
 }
 
+message ClustersGetKubeconfigRequest {
+  string cluster_id = 1;
+}
+
+message ClustersGetKubeconfigResponse {
+  string kubeconfig = 1;
+}
+
+message ClustersGetKubeconfigViaHttpRequest {
+  string cluster_id = 1;
+}
+
 service Clusters {
   // Retrieves the list of clusters.
   rpc List(ClustersListRequest) returns (ClustersListResponse) {
@@ -82,5 +95,21 @@ service Clusters {
   // Retrieves the details of one specific cluster.
   rpc Get(ClustersGetRequest) returns (ClustersGetResponse) {
     option (google.api.http) = {get: "/api/fulfillment/v1/clusters/{cluster_id}"};
+  }
+
+  // Returns the admin Kubeconfig of the cluster.
+  //
+  // This intended for use with the gRPC protocol, and it isn't mapped to an HTTP endpoint. To retrieve the Kubeconfig
+  // via HTTP see the `ClustersGetKubeconfigViaHttp` method below.
+  rpc GetKubeconfig(ClustersGetKubeconfigRequest) returns (ClustersGetKubeconfigResponse) {}
+
+  // Returns the admin Kubeconfig of the cluster.
+  //
+  // This is intended for use with HTTP and returns the YAML text of the Kubeconfig directly using the content type
+  // `application/yaml`.
+  //
+  // buf:lint:ignore RPC_RESPONSE_STANDARD_NAME
+  rpc GetKubeconfigViaHttp(ClustersGetKubeconfigViaHttpRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {get: "/api/fulfillment/v1/clusters/{cluster_id}/kubeconfig"};
   }
 }
