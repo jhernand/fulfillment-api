@@ -28,8 +28,7 @@ message Cluster {
 
 // The spec contains the details of a cluster as desired by the user. Note that currently this is empty because all the
 // details of the cluster are provided by the system.
-message ClusterSpec {
-}
+message ClusterSpec {}
 
 // The status contains the details of the cluster provided by the system.
 message ClusterStatus {
