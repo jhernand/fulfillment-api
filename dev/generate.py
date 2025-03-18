@@ -42,13 +42,12 @@ def openapi() -> None:
     # Remove previously generated files:
     project_dir = dirs.project()
     openapi_dir = project_dir / "openapi"
-    if openapi_dir.exists():
-        shutil.rmtree(openapi_dir)
-        openapi_dir.mkdir(parents=True)
     v2_dir = openapi_dir / "v2"
-    v2_dir.mkdir(parents=True)
+    if v2_dir.exists():
+        shutil.rmtree(v2_dir)
     v3_dir = openapi_dir / "v3"
-    v3_dir.mkdir(parents=True)
+    if v3_dir.exists():
+        shutil.rmtree(v3_dir)
 
     # Create a temporary directory for the downloaded files:
     tmp_dir = pathlib.Path(tempfile.mkdtemp())
@@ -71,6 +70,8 @@ def openapi() -> None:
             raise Exception(f"Expected exactly one generated OpenAPI file, but found {len(v2_tmp_files)}")
         v2_tmp_file = v2_tmp_files[0]
         v2_file = v2_dir / "openapi.json"
+        if not v2_dir.exists():
+            v2_dir.mkdir(parents=True)
         shutil.move(v2_tmp_file, v2_file)
 
         # Use the 'swagger-codegen-cli' tool to read the generated version 2 and write version 3:
@@ -92,6 +93,8 @@ def openapi() -> None:
             raise Exception(f"Expected exactly one generated OpenAPI file, but found {len(v3_tmp_files)}")
         v3_tmp_file = v3_tmp_files[0]
         v3_file = v3_dir / "openapi.yaml"
+        if not v3_dir.exists():
+            v3_dir.mkdir(parents=True)
         shutil.move(v3_tmp_file, v3_file)
     finally:
         shutil.rmtree(tmp_dir)
