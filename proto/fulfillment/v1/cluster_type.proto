@@ -15,9 +15,12 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
-// A cluster contains the details of the cluster. The spec contains the desired details, and man be modified by the
-// user.The status contains the current status of the cluster, is provided by the system and can't be modified by the
-// user.
+import "google/protobuf/timestamp.proto";
+
+// Contains the details of the cluster.
+//
+// The `spec` contains the desired details, and may be modified by the user. The `status` contains the current status of
+// the cluster, is provided by the system and can't be modified by the user.
 message Cluster {
   // Unique identifier of the cluster.
   string id = 1;
@@ -26,15 +29,121 @@ message Cluster {
   ClusterStatus status = 3;
 }
 
-// The spec contains the details of a cluster as desired by the user. Note that currently this is empty because all the
-// details of the cluster are provided by the system.
+// The spec contains the details of a cluster as desired by the user.
+//
+// Note that currently this is empty because there are no properties of the cluster that can be modified by the user.
 message ClusterSpec {}
 
 // The status contains the details of the cluster provided by the system.
 message ClusterStatus {
+  // Indicates the overall state of the cluster.
+  ClusterState state = 1;
+
+  // Contains a list of conditions that describe in detail the status of the cluster.
+  //
+  // For example, an cluster that is ready could be represented like this (when converted to JSON):
+  //
+  //    {
+  //      "id": "123",
+  //      "spec": {
+  //      },
+  //      "status": {
+  //        "state": "CLUSTER_STATE_READY",
+  //        "conditions": [
+  //          {
+  //            "type": "CLUSTER_CONDITION_TYPE_READY",
+  //            "status": "CONDITION_STATUS_TRUE",
+  //            "last_transition_time": "2025-03-12 20:15:59+00:00",
+  //            "message": "The cluster is ready to use",
+  //          },
+  //          {
+  //            "type": "CLUSTER_CONDITION_TYPE_FAILED",
+  //            "status": "CONDITION_STATUS_FALSE",
+  //            "last_transition_time": "2025-03-12 20:10:59+00:00"
+  //          }
+  //        ]
+  //      }
+  //    }
+  //
+  // In this example the `READY` condition is true. That tells us that the cluster is ready to use via the API URL
+  // provided in the `status.api_url` field.
+  //
+  // The `FAILED` condition is false. That tells us that the cluster is *not* failed.
+  //
+  // Note that in this example, to make it shorter, only one condition appears. In general all the conditions (except
+  // `UNSPECIFIED`) will appear exactly once.
+  //
+  // Check the documentation of the values of the `ClusterConditionType` enumerated type to see possible conditions and
+  // reasons.
+  repeated ClusterCondition conditions = 2;
+
   // URL of te API server of the cluster.
-  string api_url = 2;
+  //
+  // This will be empty if the cluster isn't ready.
+  string api_url = 3;
 
   // URL of the console of the cluster.
-  string console_url = 3;
+  //
+  // This will be empty if the cluster isn't ready or the console isn't enabled.
+  string console_url = 4;
+}
+
+// Represents the overall state of a cluster.
+enum ClusterState {
+  // Unspecified indicates that the state is unknown.
+  CLUSTER_STATE_UNSPECIFIED = 0;
+
+  // Indicates that the cluster isn't ready yet.
+  CLUSTER_STATE_PROGRESSING = 1;
+
+  // Indicates indicates that the cluster is ready.
+  CLUSTER_STATE_READY = 2;
+
+  // Indicates indicates that the cluster is unusable.
+  CLUSTER_STATE_FAILED = 3;
+}
+
+// Contains the details of a condition that describes the status of a cluster.
+message ClusterCondition {
+  // Indicates the type of condition.
+  ClusterConditionType type = 1;
+
+  // Indicates the status of the condition.
+  bool status = 2;
+
+  // This time is the last time that the condition was updated.
+  google.protobuf.Timestamp last_transition_time = 3;
+
+  // Contains a the reason of the condition in a format suitable for use by programs.
+  //
+  // The possible values will be documented in the object that contains the condition.
+  optional string reason = 4;
+
+  // Contains a text giving more details of the condition.
+  //
+  // This will usually be progress reports, or error messages, and are intended for use by humans, to debug problems.
+  optional string message = 5;
+}
+
+// Types of conditions used to describe the status of cluster.
+enum ClusterConditionType {
+  // Unspecified indicates that the condition is unknown.
+  //
+  // This will never be appear in the `spec.conditions` field of a cluster.
+  CLUSTER_CONDITION_TYPE_UNSPECIFIED = 0;
+
+  // Indicates that the cluster isn't completely ready yet.
+  //
+  // Currently there are no `reason` values defined.
+  CLUSTER_CONDITION_TYPE_PROGRESSING = 1;
+
+  // Indicates that the cluster is ready to use.
+  //
+  // Currently there are no `reason` values defined.
+  CLUSTER_CONDITION_TYPE_READY = 2;
+
+  // Indicates that the cluster is unusable.
+  //
+  // Currently there are no `reason` values defined.
+  CLUSTER_CONDITION_TYPE_FAILED = 3;
 }
