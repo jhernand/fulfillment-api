@@ -16,6 +16,7 @@ syntax = "proto3";
 package fulfillment.v1;
 
 import "fulfillment/v1/condition_status_type.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 
 // Contains the details that the user provides to request the provisioning of a cluster, as well as the current status
@@ -35,7 +36,41 @@ message ClusterOrderSpec {
   // Reference to the cluster template.
   //
   // This is mandatory, and must be the value of the `id` field of one of the cluster templates.
-  string template_id = 2;
+  string template_id = 1;
+
+  // Values of the template parameters.
+  //
+  // When using the HTTP+JSON version of the API the values must be represented as documented in the (ProtoJSON format
+  // document)[https://protobuf.dev/programming-guides/json]. For example, if the template has a `number_of_nodes`
+  // parameter of integer type, the complete order should be represented like this:
+  //
+  // ```json
+  // {
+  //   "template_id": "123",
+  //   "template_parameters": {
+  //     "number_of_nodes": {
+  //       "@type": "type.googleapis.com/google.protobuf.Int32Value",
+  //       "value": 42
+  //     }
+  //   }
+  // }
+  // ```
+  //
+  // The possible values of the `@type` are the same as those used by the `type_url` field of the `Any` type:
+  //
+  // | Type                           | Value                                             |
+  // |--------------------------------|---------------------------------------------------|
+  // | Boolean                        | `type.googleapis.com/google.protobuf.BoolValue`   |
+  // | Integer number, 32 bits        | `type.googleapis.com/google.protobuf.Int32Value`  |
+  // | Integer number, 64 bits        | `type.googleapis.com/google.protobuf.Int64Value`  |
+  // | Floating point number, 32 bits | `type.googleapis.com/google.protobuf.FloatValue`  |
+  // | Floating point number, 64 bits | `type.googleapis.com/google.protobuf.DoubleValue` |
+  // | String                         | `type.googleapis.com/google.protobuf.StringValue` |
+  // | Timestamp                      | `type.googleapis.com/google.protobuf.Timestamp`   |
+  // | Duration                       | `type.googleapis.com/google.protobuf.Duration`    |
+  // | Array of bytes                 | `type.googleapis.com/google.protobuf.BytesValue`  |
+  // | Any JSON value                 | `type.googleapis.com/google.protobuf.Value`       |
+  map<string, google.protobuf.Any> template_parameters = 2;
 }
 
 // Contains the current status of the order.

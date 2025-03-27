@@ -554,6 +554,13 @@
         "template_id": {
           "type": "string",
           "description": "Reference to the cluster template.\n\nThis is mandatory, and must be the value of the `id` field of one of the cluster templates."
+        },
+        "template_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufAny"
+          },
+          "description": "Values of the template parameters.\n\nWhen using the HTTP+JSON version of the API the values must be represented as documented in the (ProtoJSON format\ndocument)[https://protobuf.dev/programming-guides/json]. For example, if the template has a `number_of_nodes`\nparameter of integer type, the complete order should be represented like this:\n\n```json\n{\n  \"template_id\": \"123\",\n  \"template_parameters\": {\n    \"number_of_nodes\": {\n      \"@type\": \"type.googleapis.com/google.protobuf.Int32Value\",\n      \"value\": 42\n    }\n  }\n}\n```\n\nThe possible values of the `@type` are the same as those used by the `type_url` field of the `Any` type:\n\n| Type                           | Value                                             |\n|--------------------------------|---------------------------------------------------|\n| Boolean                        | `type.googleapis.com/google.protobuf.BoolValue`   |\n| Integer number, 32 bits        | `type.googleapis.com/google.protobuf.Int32Value`  |\n| Integer number, 64 bits        | `type.googleapis.com/google.protobuf.Int64Value`  |\n| Floating point number, 32 bits | `type.googleapis.com/google.protobuf.FloatValue`  |\n| Floating point number, 64 bits | `type.googleapis.com/google.protobuf.DoubleValue` |\n| String                         | `type.googleapis.com/google.protobuf.StringValue` |\n| Timestamp                      | `type.googleapis.com/google.protobuf.Timestamp`   |\n| Duration                       | `type.googleapis.com/google.protobuf.Duration`    |\n| Array of bytes                 | `type.googleapis.com/google.protobuf.BytesValue`  |\n| Any JSON value                 | `type.googleapis.com/google.protobuf.Value`       |"
         }
       },
       "description": "Contains the details that the user provides to request the provisioning of the cluster."
@@ -696,9 +703,47 @@
         "description": {
           "type": "string",
           "description": "Human friendly long description of the template, using Markdown format."
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ClusterTemplateParameterDefinition"
+          },
+          "description": "Definitions of the parameters that can be used to customize the template.\n\nNote that these are only the *definitions* of the parameters, not the actual values. The actual values are in the\n`spec.template_parameters` field of the cluster order."
         }
       },
       "description": "A cluster template defines a type of cluster that can be ordered by the user. Note that the user doesn't create these\ntemplates: the system provides a collection of them, and the user chooses one."
+    },
+    "v1ClusterTemplateParameterDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the parameter.\n\nThis is the name that should be used in the `template_parameters` field of the order to assign a value to the\nparameter."
+        },
+        "title": {
+          "type": "string",
+          "description": "Human friendly short description of the parameter, only a few words, suitable for displaying in one single line on\na UI or CLI."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human friendly description of the parameter, using Markdown format."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Indicates if this parameter is required or optional.\n\nValues for required parameters must be included when sending the order, otherwise it will be rejected.\n\nNote that there may be other dependencies between parameters which may cause a order to be rejected. For example,\nthe allowed values of a parameter may depend on the value of another parameter. That kind of information will be in\nthe `description` field."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the parameter.\n\nThe possible values are the same as those used by the `type_url` field of the `Any` type:\n\n| Type                           | Value                                             |\n|--------------------------------|---------------------------------------------------|\n| Boolean                        | `type.googleapis.com/google.protobuf.BoolValue`   |\n| Integer number, 32 bits        | `type.googleapis.com/google.protobuf.Int32Value`  |\n| Integer number, 64 bits        | `type.googleapis.com/google.protobuf.Int64Value`  |\n| Floating point number, 32 bits | `type.googleapis.com/google.protobuf.FloatValue`  |\n| Floating point number, 64 bits | `type.googleapis.com/google.protobuf.DoubleValue` |\n| String                         | `type.googleapis.com/google.protobuf.StringValue` |\n| Timestamp                      | `type.googleapis.com/google.protobuf.Timestamp`   |\n| Duration                       | `type.googleapis.com/google.protobuf.Duration`    |\n| Array of bytes                 | `type.googleapis.com/google.protobuf.BytesValue`  |\n| Any JSON value                 | `type.googleapis.com/google.protobuf.Value`       |\n\nWhen using the HTTP+JSON version of the API the value provided in the `template_parameters` field of the order\nmust be represented as documented in the (ProtoJSON format document)[https://protobuf.dev/programming-guides/json]."
+        },
+        "default": {
+          "$ref": "#/definitions/protobufAny",
+          "description": "Default value for optional parameters."
+        }
+      },
+      "description": "Contains type and documentation of a template parameter."
     },
     "v1ClusterTemplatesGetResponse": {
       "type": "object",
