@@ -17,13 +17,16 @@
       "name": "ClusterOrders"
     },
     {
+      "name": "Hubs"
+    },
+    {
+      "name": "Events"
+    },
+    {
       "name": "ClusterTemplates"
     },
     {
       "name": "Clusters"
-    },
-    {
-      "name": "Events"
     }
   ],
   "schemes": [
@@ -36,6 +39,48 @@
     "application/json"
   ],
   "paths": {
+    "/api/events/v1/events": {
+      "get": {
+        "summary": "Start watching events.",
+        "description": "Note that the server doesn't make any guarantee about the delivery or order of these events. In particular events\nthat happen while the client is disconnected will not be delivered. Clients should consider using other mechanisms\nto ensure that they process objects correctly. For example, they can combine this watch mechanism with periodic\nredconciliation of all the objects.",
+        "operationId": "Events_Watch",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v1EventsWatchResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of v1EventsWatchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "Filter criteria.\n\nThe value of this parameter is a [CEL](https://cel.dev) boolean expression. The `event` variable will contain the\nfields of the event. If the result of the expression is `true` then the event will be sent by the server. For\nexample, to receive only the events that indicate that a cluster order has been modified and is now in the\nfulfilled state:\n\n```\nevent.type == EVENT_TYPE_OBJECT_CREATED \u0026\u0026 event.cluster_order.status.state == CLUSTER_ORDER_STATE_FULFILLED\n```\n\nIf this isn't provided, or if the value is empty, then all the events that the user has permission to see will be\nsent by the server.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Events"
+        ]
+      }
+    },
     "/api/fulfillment/v1/cluster_orders": {
       "get": {
         "summary": "Retrieves the list of cluster orders.",
@@ -44,7 +89,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersListResponse"
+              "$ref": "#/definitions/fulfillmentv1ClusterOrdersListResponse"
             }
           },
           "default": {
@@ -97,7 +142,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrder"
+              "$ref": "#/definitions/fulfillmentv1ClusterOrder"
             }
           },
           "default": {
@@ -113,7 +158,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrder"
+              "$ref": "#/definitions/fulfillmentv1ClusterOrder"
             }
           }
         ],
@@ -130,7 +175,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrder"
+              "$ref": "#/definitions/fulfillmentv1ClusterOrder"
             }
           },
           "default": {
@@ -159,7 +204,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersDeleteResponse"
+              "$ref": "#/definitions/fulfillmentv1ClusterOrdersDeleteResponse"
             }
           },
           "default": {
@@ -586,51 +631,54 @@
           "Clusters"
         ]
       }
-    },
-    "/api/fulfillment/v1/events": {
-      "get": {
-        "summary": "Start watching events.",
-        "description": "Note that the server doesn't make any guarantee about the delivery or order of these events. In particular events\nthat happen while the client is disconnected will not be delivered. Clients should consider using other mechanisms\nto ensure that they process objects correctly. For example, they can combine this watch mechanism with periodic\nredconciliation of all the objects.",
-        "operationId": "Events_Watch",
-        "responses": {
-          "200": {
-            "description": "A successful response.(streaming responses)",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/v1EventsWatchResponse"
-                },
-                "error": {
-                  "$ref": "#/definitions/rpcStatus"
-                }
-              },
-              "title": "Stream result of v1EventsWatchResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "filter",
-            "description": "Filter criteria.\n\nThe value of this parameter is a [CEL](https://cel.dev) boolean expression. The `event` variable will contain the\nfields of the event. If the result of the expression is `true` then the event will be sent by the server. For\nexample, to receive only the events that indicate that a cluster order has been modified and is now in the\nfulfilled state:\n\n```\nevent.type == EVENT_TYPE_OBJECT_CREATED \u0026\u0026 event.cluster_order.status.state == CLUSTER_ORDER_STATE_FULFILLED\n```\n\nIf this isn't provided, or if the value is empty, then all the events that the user has permission to see will be\nsent by the server.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Events"
-        ]
-      }
     }
   },
   "definitions": {
+    "adminv1ClusterOrder": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the order."
+        },
+        "hub_id": {
+          "type": "string",
+          "description": "Identifier of the hub that was selected for this order."
+        }
+      },
+      "description": "Contains the details about order that are available only for the system."
+    },
+    "adminv1ClusterOrdersCreateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/adminv1ClusterOrder"
+        }
+      }
+    },
+    "adminv1ClusterOrdersDeleteResponse": {
+      "type": "object"
+    },
+    "adminv1ClusterOrdersGetResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/adminv1ClusterOrder"
+        }
+      }
+    },
+    "adminv1ClusterOrdersListResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminv1ClusterOrder"
+          }
+        }
+      }
+    },
     "apiHttpBody": {
       "type": "object",
       "properties": {
@@ -653,6 +701,64 @@
         }
       },
       "description": "Message that represents an arbitrary HTTP body. It should only be used for\npayload formats that can't be represented as JSON, such as raw binary or\nan HTML page.\n\n\nThis message can be used both in streaming and non-streaming API methods in\nthe request as well as the response.\n\nIt can be used as a top-level request field, which is convenient if one\nwants to extract parameters from either the URL or HTTP template into the\nrequest fields and also want access to the raw HTTP body.\n\nExample:\n\n    message GetResourceRequest {\n      // A unique request id.\n      string request_id = 1;\n\n      // The raw HTTP body is bound to this field.\n      google.api.HttpBody http_body = 2;\n\n    }\n\n    service ResourceService {\n      rpc GetResource(GetResourceRequest)\n        returns (google.api.HttpBody);\n      rpc UpdateResource(google.api.HttpBody)\n        returns (google.protobuf.Empty);\n\n    }\n\nExample with streaming methods:\n\n    service CaldavService {\n      rpc GetCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n      rpc UpdateCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n\n    }\n\nUse of this type only changes how the request and response bodies are\nhandled, all other features will continue to work unchanged."
+    },
+    "fulfillmentv1ClusterOrder": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the order.\n\nThis will be automatically generated by the system when the order is placed."
+        },
+        "spec": {
+          "$ref": "#/definitions/v1ClusterOrderSpec"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ClusterOrderStatus"
+        }
+      },
+      "description": "Contains the details that the user provides to request the provisioning of a cluster, as well as the current status\nof the order provided by the system."
+    },
+    "fulfillmentv1ClusterOrdersCreateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/fulfillmentv1ClusterOrder"
+        }
+      }
+    },
+    "fulfillmentv1ClusterOrdersDeleteResponse": {
+      "type": "object"
+    },
+    "fulfillmentv1ClusterOrdersGetResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/fulfillmentv1ClusterOrder"
+        }
+      }
+    },
+    "fulfillmentv1ClusterOrdersListResponse": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter\nof the request if there are not enough items, or of the system decides that returning that number of items isn't\nfeasible or convenient for performance reasons."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of items of the collection that match the search criteria, regardless of the number of results\nrequested with the `limit` parameter."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/fulfillmentv1ClusterOrder"
+          },
+          "description": "List of results."
+        }
+      }
     },
     "protobufAny": {
       "type": "object",
@@ -737,22 +843,6 @@
       ],
       "default": "CLUSTER_CONDITION_TYPE_UNSPECIFIED",
       "description": "Types of conditions used to describe the status of cluster.\n\n - CLUSTER_CONDITION_TYPE_UNSPECIFIED: Unspecified indicates that the condition is unknown.\n\nThis will never be appear in the `spec.conditions` field of a cluster.\n - CLUSTER_CONDITION_TYPE_PROGRESSING: Indicates that the cluster isn't completely ready yet.\n\nCurrently there are no `reason` values defined.\n - CLUSTER_CONDITION_TYPE_READY: Indicates that the cluster is ready to use.\n\nCurrently there are no `reason` values defined.\n - CLUSTER_CONDITION_TYPE_FAILED: Indicates that the cluster is unusable.\n\nCurrently there are no `reason` values defined."
-    },
-    "v1ClusterOrder": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier of the order.\n\nThis will be automatically generated by the system when the order is placed."
-        },
-        "spec": {
-          "$ref": "#/definitions/v1ClusterOrderSpec"
-        },
-        "status": {
-          "$ref": "#/definitions/v1ClusterOrderStatus"
-        }
-      },
-      "description": "Contains the details that the user provides to request the provisioning of a cluster, as well as the current status\nof the order provided by the system."
     },
     "v1ClusterOrderCondition": {
       "type": "object",
@@ -844,45 +934,11 @@
       },
       "description": "Contains the current status of the order."
     },
-    "v1ClusterOrdersCreateResponse": {
+    "v1ClusterOrdersUpdateResponse": {
       "type": "object",
       "properties": {
         "object": {
-          "$ref": "#/definitions/v1ClusterOrder"
-        }
-      }
-    },
-    "v1ClusterOrdersDeleteResponse": {
-      "type": "object"
-    },
-    "v1ClusterOrdersGetResponse": {
-      "type": "object",
-      "properties": {
-        "object": {
-          "$ref": "#/definitions/v1ClusterOrder"
-        }
-      }
-    },
-    "v1ClusterOrdersListResponse": {
-      "type": "object",
-      "properties": {
-        "size": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter\nof the request if there are not enough items, or of the system decides that returning that number of items isn't\nfeasible or convenient for performance reasons."
-        },
-        "total": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Total number of items of the collection that match the search criteria, regardless of the number of results\nrequested with the `limit` parameter."
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1ClusterOrder"
-          },
-          "description": "List of results."
+          "$ref": "#/definitions/adminv1ClusterOrder"
         }
       }
     },
@@ -1116,7 +1172,7 @@
           "$ref": "#/definitions/v1Cluster"
         },
         "cluster_order": {
-          "$ref": "#/definitions/v1ClusterOrder"
+          "$ref": "#/definitions/fulfillmentv1ClusterOrder"
         },
         "cluster_template": {
           "$ref": "#/definitions/v1ClusterTemplate"
@@ -1140,6 +1196,64 @@
       "properties": {
         "event": {
           "$ref": "#/definitions/v1Event"
+        }
+      }
+    },
+    "v1Hub": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the hub.\n\nThis will be automatically generated by the server when the hub is created."
+        },
+        "kubeconfig": {
+          "type": "string",
+          "format": "byte",
+          "description": "The Kubeconfig containing the address and credentials that the fulfillment service will use to connect to the hub."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Namespace where the cluster orders will be created."
+        }
+      },
+      "description": "Contains the details of a hub."
+    },
+    "v1HubsCreateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Hub"
+        }
+      }
+    },
+    "v1HubsDeleteResponse": {
+      "type": "object"
+    },
+    "v1HubsGetResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Hub"
+        }
+      }
+    },
+    "v1HubsListResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Hub"
+          }
+        }
+      }
+    },
+    "v1HubsUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Hub"
         }
       }
     }

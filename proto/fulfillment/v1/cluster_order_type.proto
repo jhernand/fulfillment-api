@@ -135,7 +135,7 @@ message ClusterOrderStatus {
   //
   // This will be automatically populated by the system when the requested cluster is completely provisoned. Further
   // details about the cluster, like the API URL, will be available in the corresponding `Cluster` object.
-  string cluster_id = 3;
+  string cluster_id = 4;
 }
 
 // Represents the overall state of the order.
