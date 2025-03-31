@@ -154,6 +154,10 @@ enum ClusterOrderState {
 
   // Indicates that fulfillment of the order failed.
   CLUSTER_ORDER_STATE_FAILED = 3;
+
+  // Indicates that fulfillment of the order has been deleted by the user, but the system is still performing cleanup
+  // actions to have it effectively removed.
+  CLUSTER_ORDER_STATE_TERMINATING = 4;
 }
 
 // Contains the details of a condition that describes the status of a cluster order.

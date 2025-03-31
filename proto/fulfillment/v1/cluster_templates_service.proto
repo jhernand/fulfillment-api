@@ -66,12 +66,26 @@ message ClusterTemplatesListResponse {
 }
 
 message ClusterTemplatesGetRequest {
-  string template_id = 1;
+  string id = 1;
 }
 
 message ClusterTemplatesGetResponse {
-  ClusterTemplate template = 1;
+  ClusterTemplate object = 1;
 }
+
+message ClusterTemplatesCreateRequest {
+  ClusterTemplate object = 1;
+}
+
+message ClusterTemplatesCreateResponse {
+  ClusterTemplate object = 1;
+}
+
+message ClusterTemplatesDeleteRequest {
+  string id = 1;
+}
+
+message ClusterTemplatesDeleteResponse {}
 
 service ClusterTemplates {
   // Retrieves the list of cluster templates.
@@ -81,6 +95,23 @@ service ClusterTemplates {
 
   // Retrieves the details of one specific cluster template.
   rpc Get(ClusterTemplatesGetRequest) returns (ClusterTemplatesGetResponse) {
-    option (google.api.http) = {get: "/api/fulfillment/v1/cluster_templates/{template_id}"};
+    option (google.api.http) = {
+      get: "/api/fulfillment/v1/cluster_templates/{id}"
+      response_body: "object"
+    };
+  }
+
+  // Creates a new cluster template.
+  rpc Create(ClusterTemplatesCreateRequest) returns (ClusterTemplatesCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/fulfillment/v1/cluster_templates"
+      body: "object"
+      response_body: "object"
+    };
+  }
+
+  // Delete a cluster template.
+  rpc Delete(ClusterTemplatesDeleteRequest) returns (ClusterTemplatesDeleteResponse) {
+    option (google.api.http) = {delete: "/api/fulfillment/v1/cluster_templates/{id}"};
   }
 }
