@@ -14,6 +14,12 @@
   },
   "tags": [
     {
+      "name": "Events"
+    },
+    {
+      "name": "Hubs"
+    },
+    {
       "name": "ClusterOrders"
     },
     {
@@ -21,9 +27,6 @@
     },
     {
       "name": "Clusters"
-    },
-    {
-      "name": "Events"
     }
   ],
   "schemes": [
@@ -599,13 +602,13 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "$ref": "#/definitions/v1EventsWatchResponse"
+                  "$ref": "#/definitions/fulfillmentv1EventsWatchResponse"
                 },
                 "error": {
                   "$ref": "#/definitions/rpcStatus"
                 }
               },
-              "title": "Stream result of v1EventsWatchResponse"
+              "title": "Stream result of fulfillmentv1EventsWatchResponse"
             }
           },
           "default": {
@@ -631,6 +634,31 @@
     }
   },
   "definitions": {
+    "adminv1Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the event."
+        },
+        "type": {
+          "$ref": "#/definitions/v1EventType",
+          "description": "Type of event."
+        },
+        "hub": {
+          "$ref": "#/definitions/v1Hub"
+        }
+      },
+      "description": "Represents events delivered by the server."
+    },
+    "adminv1EventsWatchResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/definitions/adminv1Event"
+        }
+      }
+    },
     "apiHttpBody": {
       "type": "object",
       "properties": {
@@ -653,6 +681,37 @@
         }
       },
       "description": "Message that represents an arbitrary HTTP body. It should only be used for\npayload formats that can't be represented as JSON, such as raw binary or\nan HTML page.\n\n\nThis message can be used both in streaming and non-streaming API methods in\nthe request as well as the response.\n\nIt can be used as a top-level request field, which is convenient if one\nwants to extract parameters from either the URL or HTTP template into the\nrequest fields and also want access to the raw HTTP body.\n\nExample:\n\n    message GetResourceRequest {\n      // A unique request id.\n      string request_id = 1;\n\n      // The raw HTTP body is bound to this field.\n      google.api.HttpBody http_body = 2;\n\n    }\n\n    service ResourceService {\n      rpc GetResource(GetResourceRequest)\n        returns (google.api.HttpBody);\n      rpc UpdateResource(google.api.HttpBody)\n        returns (google.protobuf.Empty);\n\n    }\n\nExample with streaming methods:\n\n    service CaldavService {\n      rpc GetCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n      rpc UpdateCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n\n    }\n\nUse of this type only changes how the request and response bodies are\nhandled, all other features will continue to work unchanged."
+    },
+    "fulfillmentv1Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the event."
+        },
+        "type": {
+          "$ref": "#/definitions/v1EventType",
+          "description": "Type of event."
+        },
+        "cluster": {
+          "$ref": "#/definitions/v1Cluster"
+        },
+        "cluster_order": {
+          "$ref": "#/definitions/v1ClusterOrder"
+        },
+        "cluster_template": {
+          "$ref": "#/definitions/v1ClusterTemplate"
+        }
+      },
+      "description": "Represents events delivered by the server."
+    },
+    "fulfillmentv1EventsWatchResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/definitions/fulfillmentv1Event"
+        }
+      }
     },
     "protobufAny": {
       "type": "object",
@@ -1101,29 +1160,6 @@
       "default": "CONDITION_STATUS_UNSPECIFIED",
       "description": " - CONDITION_STATUS_UNSPECIFIED: Indicates that the system can't decide if the object is in the condition or not.\n - CONDITION_STATUS_TRUE: Indicates that the object is in the condition.\n - CONDITION_STATUS_FALSE: Indicates that the object is not in the condition."
     },
-    "v1Event": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier of the event."
-        },
-        "type": {
-          "$ref": "#/definitions/v1EventType",
-          "description": "Type of event."
-        },
-        "cluster": {
-          "$ref": "#/definitions/v1Cluster"
-        },
-        "cluster_order": {
-          "$ref": "#/definitions/v1ClusterOrder"
-        },
-        "cluster_template": {
-          "$ref": "#/definitions/v1ClusterTemplate"
-        }
-      },
-      "description": "Represents events delivered by the server."
-    },
     "v1EventType": {
       "type": "string",
       "enum": [
@@ -1135,11 +1171,149 @@
       "default": "EVENT_TYPE_UNSPECIFIED",
       "description": " - EVENT_TYPE_UNSPECIFIED: Unspecified means that the even type is unknown.\n - EVENT_TYPE_OBJECT_CREATED: Means that a new object has been created.\n\nThe payload will contain the representation of the object.\n - EVENT_TYPE_OBJECT_UPDATED: Means that an existing object has been modified.\n\nThe payload will contain the updated representation of the object.\n - EVENT_TYPE_OBJECT_DELETED: Means that an object has been deleted.\n\nThe payload will contain the representation of the object right before it was deleted."
     },
-    "v1EventsWatchResponse": {
+    "v1Hub": {
       "type": "object",
       "properties": {
-        "event": {
-          "$ref": "#/definitions/v1Event"
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the hub.\n\nThis will be automatically generated by the server when the hub is created."
+        },
+        "spec": {
+          "$ref": "#/definitions/v1HubSpec"
+        },
+        "status": {
+          "$ref": "#/definitions/v1HubStatus"
+        }
+      },
+      "description": "Contains the details of a hub."
+    },
+    "v1HubCondition": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v1HubConditionType",
+          "description": "Indicates the type of condition."
+        },
+        "status": {
+          "$ref": "#/definitions/v1ConditionStatus",
+          "description": "Indicates status of the condition."
+        },
+        "last_transition_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "This time is the last time that the condition was updated."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Contains a the reason of the condition in a format suitable for use by programs.\n\nThe possible are documented in the `HubConditionType` object."
+        },
+        "message": {
+          "type": "string",
+          "description": "Contains a text giving more details of the condition. This will usually be progress reports, or error messages, and\nare intended for use by humans, to debug problems."
+        }
+      },
+      "description": "Contains the details of a condition that describes the status of a hub."
+    },
+    "v1HubConditionType": {
+      "type": "string",
+      "enum": [
+        "HUB_CONDITION_TYPE_UNSPECIFIED",
+        "HUB_CONDITION_TYPE_READY",
+        "HUB_CONDITION_TYPE_DISABLED"
+      ],
+      "default": "HUB_CONDITION_TYPE_UNSPECIFIED",
+      "description": "Types of conditions used to describe a hub.\n\n - HUB_CONDITION_TYPE_UNSPECIFIED: Unspecified indicates that the condition unknown.\n\nThis will never be appear in the `spec.conditions` field of a management cluster.\n - HUB_CONDITION_TYPE_READY: Accepted indicates that the management cluster is ready.\n - HUB_CONDITION_TYPE_DISABLED: Rejected indicates that the management cluster has been disabled by the administrator."
+    },
+    "v1HubSpec": {
+      "type": "object",
+      "properties": {
+        "kubeconfig": {
+          "type": "string",
+          "format": "byte",
+          "description": "The Kubeconfig containing the address and credentials that the fulfillment service will use to connect to the hub."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Namespace where the cluster orders will be created."
+        }
+      },
+      "description": "Contains the details that the user provides to create a hub."
+    },
+    "v1HubState": {
+      "type": "string",
+      "enum": [
+        "HUB_STATE_UNSPECIFIED",
+        "HUB_STATE_READY",
+        "HUB_STATE_DISABLED"
+      ],
+      "default": "HUB_STATE_UNSPECIFIED",
+      "description": "Represents the overall state of a hub.\n\n - HUB_STATE_UNSPECIFIED: Unspecified indicates that the state isn't set.\n - HUB_STATE_READY: Unspecified indicates that the hub is ready.\n - HUB_STATE_DISABLED: Indicates that hub has been disabled by the administrator."
+    },
+    "v1HubStatus": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/v1HubState",
+          "description": "Indicates the overall state of a hub.\n\nFor more details check the conditions."
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1HubCondition"
+          },
+          "description": "Contains a list of conditions that describe in detail the hub.\n\nFor example, hub that has been disabled by the administrator would be represented like this (when converted to\nJSON):\n\n   {\n     \"id\": \"123\",\n     \"spec\": {\n       \"kubeconfig\": \"...\"\n     },\n     \"state\": \"HUB_STATE_DISABLED\",\n     \"status\": {\n       \"conditions\": [\n         {\n           \"type: \"HUB_CONDITION_TYPE_READY\",\n           \"status\": \"CONDITION_STATUS_FALSE\",\n           \"last_transition_time\": \"2025-03-12 20:15:59+00:00\"\n         },\n         {\n           \"type\": \"HUB_CONDITION_TYPE_DISABLED\",\n           \"status\": \"CONDITION_STATUS_FALSE\",\n           \"last_transition_time\": \"2025-03-12 20:17:16+00:00\",\n           \"reason\": \"Disabled\",\n           \"message\": \"The management cluster has been disabled by the administrator\"\n         },\n       ]\n     }\n   }\n\nIn this example the `DISABLED` condition is true. That tells us that the hub has disabled by the administrator."
+        }
+      },
+      "description": "Contains the current status of a hub."
+    },
+    "v1HubsCreateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Hub"
+        }
+      }
+    },
+    "v1HubsDeleteResponse": {
+      "type": "object"
+    },
+    "v1HubsGetResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Hub"
+        }
+      }
+    },
+    "v1HubsListResponse": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter\nof the request if there are not enough items, or of the system decides that returning that number of items isn't\nfeasible or convenient for performance reasons."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of items of the collection that match the search criteria, regardless of the number of results\nrequested with the `limit` parameter."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Hub"
+          },
+          "description": "List of results."
+        }
+      }
+    },
+    "v1HubsUpdateStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/v1HubStatus"
         }
       }
     }

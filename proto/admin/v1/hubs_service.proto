@@ -1,0 +1,90 @@
+//
+// Copyright (c) 2025 Red Hat, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+// the License. You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
+//
+
+syntax = "proto3";
+
+package admin.v1;
+
+import "admin/v1/hub_type.proto";
+
+message HubsListRequest {
+  // Index of the first result. If not specified the default value will be zero.
+  optional int32 offset = 1;
+
+  // Maximum number of results to be returned by the server. When not specified all the results will be returned. Note
+  // that there may not be enough results to return, and that the server may decide, for performance reasons, to return
+  // less results than requested.
+  optional int32 limit = 2;
+}
+
+message HubsListResponse {
+  // Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
+  // of the request if there are not enough items, or of the system decides that returning that number of items isn't
+  // feasible or convenient for performance reasons.
+  optional int32 size = 1;
+
+  // Total number of items of the collection that match the search criteria, regardless of the number of results
+  // requested with the `limit` parameter.
+  optional int32 total = 2;
+
+  // List of results.
+  repeated Hub items = 3;
+}
+
+message HubsGetRequest {
+  string id = 1;
+}
+
+message HubsGetResponse {
+  Hub object = 1;
+}
+
+message HubsCreateRequest {
+  Hub object = 1;
+}
+
+message HubsCreateResponse {
+  Hub object = 1;
+}
+
+message HubsDeleteRequest {
+  string id = 1;
+}
+
+message HubsDeleteResponse {}
+
+message HubsUpdateStatusRequest {
+  string id = 1;
+  HubStatus status = 2;
+}
+
+message HubsUpdateStatusResponse {
+  HubStatus status = 1;
+}
+
+service Hubs {
+  // Retrieves the list of hubs.
+  rpc List(HubsListRequest) returns (HubsListResponse) {}
+
+  // Retrieves the details of one specific hub.
+  rpc Get(HubsGetRequest) returns (HubsGetResponse) {}
+
+  // Creates a new hub.
+  rpc Create(HubsCreateRequest) returns (HubsCreateResponse) {}
+
+  // Delete a hub.
+  rpc Delete(HubsDeleteRequest) returns (HubsDeleteResponse) {}
+
+  // Updates the status of a hub.
+  rpc UpdateStatus(HubsUpdateStatusRequest) returns (HubsUpdateStatusResponse) {}
+}

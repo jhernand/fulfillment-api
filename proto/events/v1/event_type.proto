@@ -13,11 +13,12 @@
 
 syntax = "proto3";
 
-package fulfillment.v1;
+package events.v1;
 
 import "fulfillment/v1/cluster_order_type.proto";
 import "fulfillment/v1/cluster_template_type.proto";
 import "fulfillment/v1/cluster_type.proto";
+import "admin/v1/hub_type.proto";
 
 // Represents events delivered by the server.
 message Event {
@@ -29,9 +30,13 @@ message Event {
 
   // Payload of the event.
   oneof payload {
-    Cluster cluster = 3;
-    ClusterOrder cluster_order = 4;
-    ClusterTemplate cluster_template = 5;
+    // For the fulfillment API:
+    fulfillment.v1.Cluster cluster = 3;
+    fulfillment.v1.ClusterOrder cluster_order = 4;
+    fulfillment.v1.ClusterTemplate cluster_template = 5;
+
+    // For the administration API:
+    admin.v1.Hub hub = 6;
   }
 }
 
