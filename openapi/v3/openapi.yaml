@@ -11,10 +11,57 @@ info:
 servers:
 - url: /
 tags:
+- name: Events
 - name: ClusterOrders
 - name: ClusterTemplates
 - name: Clusters
 paths:
+  /api/events/v1/events:
+    get:
+      tags:
+      - Events
+      summary: Start watching events.
+      description: |-
+        Note that the server doesn't make any guarantee about the delivery or order of these events. In particular events
+        that happen while the client is disconnected will not be delivered. Clients should consider using other mechanisms
+        to ensure that they process objects correctly. For example, they can combine this watch mechanism with periodic
+        redconciliation of all the objects.
+      operationId: Events_Watch
+      parameters:
+      - name: filter
+        in: query
+        description: |-
+          Filter criteria.
+
+          The value of this parameter is a [CEL](https://cel.dev) boolean expression. The `event` variable will contain the
+          fields of the event. If the result of the expression is `true` then the event will be sent by the server. For
+          example, to receive only the events that indicate that a cluster order has been modified and is now in the
+          fulfilled state:
+
+          ```
+          event.type == EVENT_TYPE_OBJECT_CREATED && event.cluster_order.status.state == CLUSTER_ORDER_STATE_FULFILLED
+          ```
+
+          If this isn't provided, or if the value is empty, then all the events that the user has permission to see will be
+          sent by the server.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.(streaming responses)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stream result of v1EventsWatchResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
   /api/fulfillment/v1/cluster_orders:
     get:
       tags:
@@ -95,36 +142,36 @@ paths:
     post:
       tags:
       - ClusterOrders
-      summary: Places a new cluster order.
-      operationId: ClusterOrders_Place
+      summary: Creates a new cluster order.
+      operationId: ClusterOrders_Create
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/v1ClusterOrdersPlaceRequest"
+              $ref: "#/components/schemas/v1ClusterOrder"
         required: true
       responses:
         "200":
-          description: A successful response.
+          description: ""
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterOrdersPlaceResponse"
+                $ref: "#/components/schemas/v1ClusterOrder"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-      x-codegen-request-body-name: body
-  /api/fulfillment/v1/cluster_orders/{order_id}:
+      x-codegen-request-body-name: object
+  /api/fulfillment/v1/cluster_orders/{id}:
     get:
       tags:
       - ClusterOrders
       summary: Retrieves the details of one specific cluster order.
       operationId: ClusterOrders_Get
       parameters:
-      - name: order_id
+      - name: id
         in: path
         required: true
         style: simple
@@ -133,11 +180,11 @@ paths:
           type: string
       responses:
         "200":
-          description: A successful response.
+          description: ""
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterOrdersGetResponse"
+                $ref: "#/components/schemas/v1ClusterOrder"
         default:
           description: An unexpected error response.
           content:
@@ -147,10 +194,10 @@ paths:
     delete:
       tags:
       - ClusterOrders
-      summary: Cancels a cluster order.
-      operationId: ClusterOrders_Cancel
+      summary: Delete a cluster order.
+      operationId: ClusterOrders_Delete
       parameters:
-      - name: order_id
+      - name: id
         in: path
         required: true
         style: simple
@@ -163,13 +210,71 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterOrdersCancelResponse"
+                $ref: "#/components/schemas/v1ClusterOrdersDeleteResponse"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
+  /api/fulfillment/v1/cluster_orders/{object.id}:
+    patch:
+      tags:
+      - ClusterOrders
+      summary: Updates an existing cluster order.
+      description: |-
+        In the HTTP+JSON version of the API this is mapped to the `PATCH` verb and the `update_mask` field is automatically
+        populated from the list of fields present in the request body. For example, to update the `state` of an order to
+        `FULFILLED` the request line should be like this:
+
+        ```http
+        PATCH /api/fulfillment/v1/cluster_orders/123
+        ```
+
+        And the request body should be like this:
+
+        ```json
+        {
+          "status": {
+            "state": "CLUSTER_ORDER_STATE_FULFILLED"
+          }
+        }
+        ```
+
+        The response body will contain the modified object.
+      operationId: ClusterOrders_Update
+      parameters:
+      - name: object.id
+        in: path
+        description: |-
+          Unique identifier of the order.
+
+          This will be automatically generated by the system when the order is placed.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/cluster_orders_object_id_body"
+        required: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterOrder"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      x-codegen-request-body-name: object
   /api/fulfillment/v1/cluster_templates:
     get:
       tags:
@@ -247,14 +352,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfillment/v1/cluster_templates/{template_id}:
+    post:
+      tags:
+      - ClusterTemplates
+      summary: Creates a new cluster template.
+      operationId: ClusterTemplates_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/v1ClusterTemplate"
+        required: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterTemplate"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      x-codegen-request-body-name: object
+  /api/fulfillment/v1/cluster_templates/{id}:
     get:
       tags:
       - ClusterTemplates
       summary: Retrieves the details of one specific cluster template.
       operationId: ClusterTemplates_Get
       parameters:
-      - name: template_id
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterTemplate"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+    delete:
+      tags:
+      - ClusterTemplates
+      summary: Delete a cluster template.
+      operationId: ClusterTemplates_Delete
+      parameters:
+      - name: id
         in: path
         required: true
         style: simple
@@ -267,13 +423,48 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClusterTemplatesGetResponse"
+                $ref: "#/components/schemas/v1ClusterTemplatesDeleteResponse"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
+  /api/fulfillment/v1/cluster_templates/{object.id}:
+    patch:
+      tags:
+      - ClusterTemplates
+      summary: Updates an existint cluster template.
+      operationId: ClusterTemplates_Update
+      parameters:
+      - name: object.id
+        in: path
+        description: Unique identifier of the template.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/cluster_templates_object_id_body"
+        required: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ClusterTemplate"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      x-codegen-request-body-name: object
   /api/fulfillment/v1/clusters:
     get:
       tags:
@@ -351,14 +542,68 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfillment/v1/clusters/{cluster_id}:
+    post:
+      tags:
+      - Clusters
+      summary: Creates a new cluster.
+      description: |-
+        Note that this operation is not allowed for regular users, only for the server. Regular users create clusters
+        indirectly, creating a cluster order that will eventually result in the system creating a cluster.
+      operationId: Clusters_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/v1Cluster"
+        required: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1Cluster"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      x-codegen-request-body-name: object
+  /api/fulfillment/v1/clusters/{id}:
     get:
       tags:
       - Clusters
       summary: Retrieves the details of one specific cluster.
       operationId: Clusters_Get
       parameters:
-      - name: cluster_id
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1Cluster"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+    delete:
+      tags:
+      - Clusters
+      summary: Delete a cluster.
+      operationId: Clusters_Delete
+      parameters:
+      - name: id
         in: path
         required: true
         style: simple
@@ -371,14 +616,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1ClustersGetResponse"
+                $ref: "#/components/schemas/v1ClustersDeleteResponse"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfillment/v1/clusters/{cluster_id}/kubeconfig:
+  /api/fulfillment/v1/clusters/{id}/kubeconfig:
     get:
       tags:
       - Clusters
@@ -390,7 +635,7 @@ paths:
         buf:lint:ignore RPC_RESPONSE_STANDARD_NAME
       operationId: Clusters_GetKubeconfigViaHttp
       parameters:
-      - name: cluster_id
+      - name: id
         in: path
         required: true
         style: simple
@@ -410,6 +655,61 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
+  /api/fulfillment/v1/clusters/{object.id}:
+    patch:
+      tags:
+      - Clusters
+      summary: Updates an existing cluster.
+      description: |-
+        In the HTTP+JSON version of the API this is mapped to the `PATCH` verb and the `update_mask` field is automatically
+        populated from the list of fields present in the request body. For example, to update the `state` of a cluster to
+        `READY` the request line should be like this:
+
+        ```http
+        PATCH /api/fulfillment/v1/clusters/123
+        ```
+
+        And the request body should be like this:
+
+        ```json
+        {
+          "status": {
+            "state": "CLUSTER_STATE_READY"
+          }
+        }
+        ```
+
+        The response body will contain the modified object.
+      operationId: Clusters_Update
+      parameters:
+      - name: object.id
+        in: path
+        description: Unique identifier of the cluster.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/clusters_object_id_body"
+        required: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1Cluster"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      x-codegen-request-body-name: object
 components:
   schemas:
     apiHttpBody:
@@ -615,6 +915,8 @@ components:
         id:
           type: string
           description: Unique identifier of the cluster.
+        metadata:
+          $ref: "#/components/schemas/v1Metadata"
         spec:
           $ref: "#/components/schemas/v1ClusterSpec"
         status:
@@ -630,8 +932,7 @@ components:
         type:
           $ref: "#/components/schemas/v1ClusterConditionType"
         status:
-          type: boolean
-          description: Indicates the status of the condition.
+          $ref: "#/components/schemas/v1ConditionStatus"
         last_transition_time:
           type: string
           description: This time is the last time that the condition was updated.
@@ -682,6 +983,8 @@ components:
             Unique identifier of the order.
 
             This will be automatically generated by the system when the order is placed.
+        metadata:
+          $ref: "#/components/schemas/v1Metadata"
         spec:
           $ref: "#/components/schemas/v1ClusterOrderSpec"
         status:
@@ -872,12 +1175,17 @@ components:
             This will be automatically populated by the system when the requested cluster is completely provisoned. Further
             details about the cluster, like the API URL, will be available in the corresponding `Cluster` object.
       description: Contains the current status of the order.
-    v1ClusterOrdersCancelResponse:
+    v1ClusterOrdersCreateResponse:
+      type: object
+      properties:
+        object:
+          $ref: "#/components/schemas/v1ClusterOrder"
+    v1ClusterOrdersDeleteResponse:
       type: object
     v1ClusterOrdersGetResponse:
       type: object
       properties:
-        order:
+        object:
           $ref: "#/components/schemas/v1ClusterOrder"
     v1ClusterOrdersListResponse:
       type: object
@@ -900,15 +1208,10 @@ components:
           description: List of results.
           items:
             $ref: "#/components/schemas/v1ClusterOrder"
-    v1ClusterOrdersPlaceRequest:
+    v1ClusterOrdersUpdateResponse:
       type: object
       properties:
-        order:
-          $ref: "#/components/schemas/v1ClusterOrder"
-    v1ClusterOrdersPlaceResponse:
-      type: object
-      properties:
-        order:
+        object:
           $ref: "#/components/schemas/v1ClusterOrder"
     v1ClusterSpec:
       type: object
@@ -997,6 +1300,8 @@ components:
         id:
           type: string
           description: Unique identifier of the template.
+        metadata:
+          $ref: "#/components/schemas/v1Metadata"
         title:
           type: string
           description: |-
@@ -1072,10 +1377,17 @@ components:
         default:
           $ref: "#/components/schemas/protobufAny"
       description: Contains type and documentation of a template parameter.
+    v1ClusterTemplatesCreateResponse:
+      type: object
+      properties:
+        object:
+          $ref: "#/components/schemas/v1ClusterTemplate"
+    v1ClusterTemplatesDeleteResponse:
+      type: object
     v1ClusterTemplatesGetResponse:
       type: object
       properties:
-        template:
+        object:
           $ref: "#/components/schemas/v1ClusterTemplate"
     v1ClusterTemplatesListResponse:
       type: object
@@ -1098,6 +1410,18 @@ components:
           description: List of results.
           items:
             $ref: "#/components/schemas/v1ClusterTemplate"
+    v1ClusterTemplatesUpdateResponse:
+      type: object
+      properties:
+        object:
+          $ref: "#/components/schemas/v1ClusterTemplate"
+    v1ClustersCreateResponse:
+      type: object
+      properties:
+        object:
+          $ref: "#/components/schemas/v1Cluster"
+    v1ClustersDeleteResponse:
+      type: object
     v1ClustersGetKubeconfigResponse:
       type: object
       properties:
@@ -1106,7 +1430,7 @@ components:
     v1ClustersGetResponse:
       type: object
       properties:
-        cluster:
+        object:
           $ref: "#/components/schemas/v1Cluster"
     v1ClustersListResponse:
       type: object
@@ -1129,6 +1453,13 @@ components:
           description: List of results.
           items:
             $ref: "#/components/schemas/v1Cluster"
+    v1ClustersUpdateResponse:
+      type: object
+      properties:
+        object:
+          $ref: "#/components/schemas/v1Cluster"
+        update_mask:
+          type: string
     v1ConditionStatus:
       type: string
       description: |2-
@@ -1140,4 +1471,115 @@ components:
       - CONDITION_STATUS_UNSPECIFIED
       - CONDITION_STATUS_TRUE
       - CONDITION_STATUS_FALSE
+    v1Event:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the event.
+        type:
+          $ref: "#/components/schemas/v1EventType"
+        cluster:
+          $ref: "#/components/schemas/v1Cluster"
+        cluster_order:
+          $ref: "#/components/schemas/v1ClusterOrder"
+        cluster_template:
+          $ref: "#/components/schemas/v1ClusterTemplate"
+      description: Represents events delivered by the server.
+    v1EventType:
+      type: string
+      description: |2-
+         - EVENT_TYPE_UNSPECIFIED: Unspecified means that the even type is unknown.
+         - EVENT_TYPE_OBJECT_CREATED: Means that a new object has been created.
+
+        The payload will contain the representation of the object.
+         - EVENT_TYPE_OBJECT_UPDATED: Means that an existing object has been modified.
+
+        The payload will contain the updated representation of the object.
+         - EVENT_TYPE_OBJECT_DELETED: Means that an object has been deleted.
+
+        The payload will contain the representation of the object right before it was deleted.
+      default: EVENT_TYPE_UNSPECIFIED
+      enum:
+      - EVENT_TYPE_UNSPECIFIED
+      - EVENT_TYPE_OBJECT_CREATED
+      - EVENT_TYPE_OBJECT_UPDATED
+      - EVENT_TYPE_OBJECT_DELETED
+    v1EventsWatchResponse:
+      type: object
+      properties:
+        event:
+          $ref: "#/components/schemas/v1Event"
+    v1Metadata:
+      type: object
+      properties:
+        creation_timestamp:
+          type: string
+          description: Time of creation of the object.
+          format: date-time
+        deletion_timestamp:
+          type: string
+          description: Time of deletion of the object.
+          format: date-time
+      description: Metadata common to all kinds of objects.
+    Stream result of v1EventsWatchResponse:
+      title: Stream result of v1EventsWatchResponse
+      type: object
+      properties:
+        result:
+          $ref: "#/components/schemas/v1EventsWatchResponse"
+        error:
+          $ref: "#/components/schemas/rpcStatus"
+    cluster_orders_object_id_body:
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/v1Metadata"
+        spec:
+          $ref: "#/components/schemas/v1ClusterOrderSpec"
+        status:
+          $ref: "#/components/schemas/v1ClusterOrderStatus"
+      description: |-
+        Contains the details that the user provides to request the provisioning of a cluster, as well as the current status
+        of the order provided by the system.
+    cluster_templates_object_id_body:
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/v1Metadata"
+        title:
+          type: string
+          description: |-
+            Human friendly short description of the template, only a few words, suitable for displaying in one single
+            line on a UI or CLI.
+        description:
+          type: string
+          description: "Human friendly long description of the template, using Markdown\
+            \ format."
+        parameters:
+          type: array
+          description: |-
+            Definitions of the parameters that can be used to customize the template.
+
+            Note that these are only the *definitions* of the parameters, not the actual values. The actual values are in the
+            `spec.template_parameters` field of the cluster order.
+          items:
+            $ref: "#/components/schemas/v1ClusterTemplateParameterDefinition"
+      description: |-
+        A cluster template defines a type of cluster that can be ordered by the user. Note that the user doesn't create these
+        templates: the system provides a collection of them, and the user chooses one.
+    clusters_object_id_body:
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/v1Metadata"
+        spec:
+          $ref: "#/components/schemas/v1ClusterSpec"
+        status:
+          $ref: "#/components/schemas/v1ClusterStatus"
+      description: |-
+        Contains the details of the cluster.
+
+        The `spec` contains the desired details, and may be modified by the user. The `status` contains the current status of
+        the cluster, is provided by the system and can't be modified by the user.
 x-original-swagger-version: "2.0"

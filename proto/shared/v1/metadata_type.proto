@@ -13,15 +13,15 @@
 
 syntax = "proto3";
 
-package fulfillment.v1;
+package shared.v1;
 
-enum ConditionStatus {
-  // Indicates that the system can't decide if the object is in the condition or not.
-  CONDITION_STATUS_UNSPECIFIED = 0;
+import "google/protobuf/timestamp.proto";
 
-  // Indicates that the object is in the condition.
-  CONDITION_STATUS_TRUE = 1;
+// Metadata common to all kinds of objects.
+message Metadata {
+  // Time of creation of the object.
+  google.protobuf.Timestamp creation_timestamp = 1;
 
-  // Indicates that the object is not in the condition.
-  CONDITION_STATUS_FALSE = 2;
+  // Time of deletion of the object.
+  google.protobuf.Timestamp deletion_timestamp = 2;
 }
