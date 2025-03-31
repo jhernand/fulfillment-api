@@ -13,7 +13,7 @@
 
 syntax = "proto3";
 
-package fulfillment.v1;
+package shared.v1;
 
 enum ConditionStatus {
   // Indicates that the system can't decide if the object is in the condition or not.

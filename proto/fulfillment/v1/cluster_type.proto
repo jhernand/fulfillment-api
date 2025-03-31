@@ -16,6 +16,7 @@ syntax = "proto3";
 package fulfillment.v1;
 
 import "google/protobuf/timestamp.proto";
+import "shared/v1/condition_status_type.proto";
 
 // Contains the details of the cluster.
 //
@@ -109,7 +110,7 @@ message ClusterCondition {
   ClusterConditionType type = 1;
 
   // Indicates the status of the condition.
-  bool status = 2;
+  shared.v1.ConditionStatus status = 2;
 
   // This time is the last time that the condition was updated.
   google.protobuf.Timestamp last_transition_time = 3;

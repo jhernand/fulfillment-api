@@ -15,9 +15,9 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
-import "fulfillment/v1/condition_status_type.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
+import "shared/v1/condition_status_type.proto";
 
 // Contains the details that the user provides to request the provisioning of a cluster, as well as the current status
 // of the order provided by the system.
@@ -162,7 +162,7 @@ message ClusterOrderCondition {
   ClusterOrderConditionType type = 1;
 
   // Indicates status of the condition.
-  ConditionStatus status = 2;
+  shared.v1.ConditionStatus status = 2;
 
   // This time is the last time that the condition was updated.
   google.protobuf.Timestamp last_transition_time = 3;

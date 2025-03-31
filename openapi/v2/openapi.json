@@ -708,7 +708,7 @@
           "description": "Indicates the type of condition."
         },
         "status": {
-          "type": "boolean",
+          "$ref": "#/definitions/v1ConditionStatus",
           "description": "Indicates the status of the condition."
         },
         "last_transition_time": {

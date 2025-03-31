@@ -886,8 +886,7 @@ components:
         type:
           $ref: "#/components/schemas/v1ClusterConditionType"
         status:
-          type: boolean
-          description: Indicates the status of the condition.
+          $ref: "#/components/schemas/v1ConditionStatus"
         last_transition_time:
           type: string
           description: This time is the last time that the condition was updated.
