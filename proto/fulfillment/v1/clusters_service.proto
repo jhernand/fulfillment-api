@@ -18,6 +18,7 @@ package fulfillment.v1;
 import "fulfillment/v1/cluster_type.proto";
 import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
+import "google/protobuf/field_mask.proto";
 
 message ClustersListRequest {
   // Index of the first result. If not specified the default value will be zero.
@@ -67,15 +68,15 @@ message ClustersListResponse {
 }
 
 message ClustersGetRequest {
-  string cluster_id = 1;
+  string id = 1;
 }
 
 message ClustersGetResponse {
-  Cluster cluster = 1;
+  Cluster object = 1;
 }
 
 message ClustersGetKubeconfigRequest {
-  string cluster_id = 1;
+  string id = 1;
 }
 
 message ClustersGetKubeconfigResponse {
@@ -83,8 +84,31 @@ message ClustersGetKubeconfigResponse {
 }
 
 message ClustersGetKubeconfigViaHttpRequest {
-  string cluster_id = 1;
+  string id = 1;
 }
+
+message ClustersCreateRequest {
+  Cluster object = 1;
+}
+
+message ClustersCreateResponse {
+  Cluster object = 1;
+}
+
+message ClustersUpdateRequest {
+  Cluster object = 1;
+}
+
+message ClustersUpdateResponse {
+  Cluster object = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message ClustersDeleteRequest {
+  string id = 1;
+}
+
+message ClustersDeleteResponse {}
 
 service Clusters {
   // Retrieves the list of clusters.
@@ -94,7 +118,10 @@ service Clusters {
 
   // Retrieves the details of one specific cluster.
   rpc Get(ClustersGetRequest) returns (ClustersGetResponse) {
-    option (google.api.http) = {get: "/api/fulfillment/v1/clusters/{cluster_id}"};
+    option (google.api.http) = {
+      get: "/api/fulfillment/v1/clusters/{id}"
+      response_body: "object"
+    };
   }
 
   // Returns the admin Kubeconfig of the cluster.
@@ -110,6 +137,52 @@ service Clusters {
   //
   // buf:lint:ignore RPC_RESPONSE_STANDARD_NAME
   rpc GetKubeconfigViaHttp(ClustersGetKubeconfigViaHttpRequest) returns (google.api.HttpBody) {
-    option (google.api.http) = {get: "/api/fulfillment/v1/clusters/{cluster_id}/kubeconfig"};
+    option (google.api.http) = {get: "/api/fulfillment/v1/clusters/{id}/kubeconfig"};
+  }
+
+  // Creates a new cluster.
+  //
+  // Note that this operation is not allowed for regular users, only for the server. Regular users create clusters
+  // indirectly, creating a cluster order that will eventually result in the system creating a cluster.
+  rpc Create(ClustersCreateRequest) returns (ClustersCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/fulfillment/v1/clusters"
+      body: "object"
+      response_body: "object"
+    };
+  }
+
+  // Updates an existing cluster.
+  //
+  // In the HTTP+JSON version of the API this is mapped to the `PATCH` verb and the `update_mask` field is automatically
+  // populated from the list of fields present in the request body. For example, to update the `state` of a cluster to
+  // `READY` the request line should be like this:
+  //
+  // ```http
+  // PATCH /api/fulfillment/v1/clusters/123
+  // ```
+  //
+  // And the request body should be like this:
+  //
+  // ```json
+  // {
+  //   "status": {
+  //     "state": "CLUSTER_STATE_READY"
+  //   }
+  // }
+  // ```
+  //
+  // The response body will contain the modified object.
+  rpc Update(ClustersUpdateRequest) returns (ClustersUpdateResponse) {
+    option (google.api.http) = {
+      patch: "/api/fulfillment/v1/clusters/{object.id}"
+      body: "object"
+      response_body: "object"
+    };
+  }
+
+  // Delete a cluster.
+  rpc Delete(ClustersDeleteRequest) returns (ClustersDeleteResponse) {
+    option (google.api.http) = {delete: "/api/fulfillment/v1/clusters/{id}"};
   }
 }

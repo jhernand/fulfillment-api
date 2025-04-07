@@ -14,6 +14,9 @@
   },
   "tags": [
     {
+      "name": "Events"
+    },
+    {
       "name": "ClusterOrders"
     },
     {
@@ -33,6 +36,48 @@
     "application/json"
   ],
   "paths": {
+    "/api/events/v1/events": {
+      "get": {
+        "summary": "Start watching events.",
+        "description": "Note that the server doesn't make any guarantee about the delivery or order of these events. In particular events\nthat happen while the client is disconnected will not be delivered. Clients should consider using other mechanisms\nto ensure that they process objects correctly. For example, they can combine this watch mechanism with periodic\nredconciliation of all the objects.",
+        "operationId": "Events_Watch",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v1EventsWatchResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of v1EventsWatchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "Filter criteria.\n\nThe value of this parameter is a [CEL](https://cel.dev) boolean expression. The `event` variable will contain the\nfields of the event. If the result of the expression is `true` then the event will be sent by the server. For\nexample, to receive only the events that indicate that a cluster order has been modified and is now in the\nfulfilled state:\n\n```\nevent.type == EVENT_TYPE_OBJECT_CREATED \u0026\u0026 event.cluster_order.status.state == CLUSTER_ORDER_STATE_FULFILLED\n```\n\nIf this isn't provided, or if the value is empty, then all the events that the user has permission to see will be\nsent by the server.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Events"
+        ]
+      }
+    },
     "/api/fulfillment/v1/cluster_orders": {
       "get": {
         "summary": "Retrieves the list of cluster orders.",
@@ -88,13 +133,13 @@
         ]
       },
       "post": {
-        "summary": "Places a new cluster order.",
-        "operationId": "ClusterOrders_Place",
+        "summary": "Creates a new cluster order.",
+        "operationId": "ClusterOrders_Create",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersPlaceResponse"
+              "$ref": "#/definitions/v1ClusterOrder"
             }
           },
           "default": {
@@ -106,11 +151,11 @@
         },
         "parameters": [
           {
-            "name": "body",
+            "name": "object",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersPlaceRequest"
+              "$ref": "#/definitions/v1ClusterOrder"
             }
           }
         ],
@@ -119,15 +164,15 @@
         ]
       }
     },
-    "/api/fulfillment/v1/cluster_orders/{order_id}": {
+    "/api/fulfillment/v1/cluster_orders/{id}": {
       "get": {
         "summary": "Retrieves the details of one specific cluster order.",
         "operationId": "ClusterOrders_Get",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersGetResponse"
+              "$ref": "#/definitions/v1ClusterOrder"
             }
           },
           "default": {
@@ -139,7 +184,7 @@
         },
         "parameters": [
           {
-            "name": "order_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -150,13 +195,13 @@
         ]
       },
       "delete": {
-        "summary": "Cancels a cluster order.",
-        "operationId": "ClusterOrders_Cancel",
+        "summary": "Delete a cluster order.",
+        "operationId": "ClusterOrders_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ClusterOrdersCancelResponse"
+              "$ref": "#/definitions/v1ClusterOrdersDeleteResponse"
             }
           },
           "default": {
@@ -168,10 +213,63 @@
         },
         "parameters": [
           {
-            "name": "order_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "ClusterOrders"
+        ]
+      }
+    },
+    "/api/fulfillment/v1/cluster_orders/{object.id}": {
+      "patch": {
+        "summary": "Updates an existing cluster order.",
+        "description": "In the HTTP+JSON version of the API this is mapped to the `PATCH` verb and the `update_mask` field is automatically\npopulated from the list of fields present in the request body. For example, to update the `state` of an order to\n`FULFILLED` the request line should be like this:\n\n```http\nPATCH /api/fulfillment/v1/cluster_orders/123\n```\n\nAnd the request body should be like this:\n\n```json\n{\n  \"status\": {\n    \"state\": \"CLUSTER_ORDER_STATE_FULFILLED\"\n  }\n}\n```\n\nThe response body will contain the modified object.",
+        "operationId": "ClusterOrders_Update",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1ClusterOrder"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "object.id",
+            "description": "Unique identifier of the order.\n\nThis will be automatically generated by the system when the order is placed.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "object",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "metadata": {
+                  "$ref": "#/definitions/v1Metadata"
+                },
+                "spec": {
+                  "$ref": "#/definitions/v1ClusterOrderSpec"
+                },
+                "status": {
+                  "$ref": "#/definitions/v1ClusterOrderStatus"
+                }
+              },
+              "description": "Contains the details that the user provides to request the provisioning of a cluster, as well as the current status\nof the order provided by the system."
+            }
           }
         ],
         "tags": [
@@ -232,17 +330,15 @@
         "tags": [
           "ClusterTemplates"
         ]
-      }
-    },
-    "/api/fulfillment/v1/cluster_templates/{template_id}": {
-      "get": {
-        "summary": "Retrieves the details of one specific cluster template.",
-        "operationId": "ClusterTemplates_Get",
+      },
+      "post": {
+        "summary": "Creates a new cluster template.",
+        "operationId": "ClusterTemplates_Create",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
-              "$ref": "#/definitions/v1ClusterTemplatesGetResponse"
+              "$ref": "#/definitions/v1ClusterTemplate"
             }
           },
           "default": {
@@ -254,10 +350,134 @@
         },
         "parameters": [
           {
-            "name": "template_id",
+            "name": "object",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ClusterTemplate"
+            }
+          }
+        ],
+        "tags": [
+          "ClusterTemplates"
+        ]
+      }
+    },
+    "/api/fulfillment/v1/cluster_templates/{id}": {
+      "get": {
+        "summary": "Retrieves the details of one specific cluster template.",
+        "operationId": "ClusterTemplates_Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1ClusterTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "ClusterTemplates"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a cluster template.",
+        "operationId": "ClusterTemplates_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ClusterTemplatesDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClusterTemplates"
+        ]
+      }
+    },
+    "/api/fulfillment/v1/cluster_templates/{object.id}": {
+      "patch": {
+        "summary": "Updates an existint cluster template.",
+        "operationId": "ClusterTemplates_Update",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1ClusterTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "object.id",
+            "description": "Unique identifier of the template.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "object",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "metadata": {
+                  "$ref": "#/definitions/v1Metadata"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Human friendly short description of the template, only a few words, suitable for displaying in one single\nline on a UI or CLI."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Human friendly long description of the template, using Markdown format."
+                },
+                "parameters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/v1ClusterTemplateParameterDefinition"
+                  },
+                  "description": "Definitions of the parameters that can be used to customize the template.\n\nNote that these are only the *definitions* of the parameters, not the actual values. The actual values are in the\n`spec.template_parameters` field of the cluster order."
+                }
+              },
+              "description": "A cluster template defines a type of cluster that can be ordered by the user. Note that the user doesn't create these\ntemplates: the system provides a collection of them, and the user chooses one."
+            }
           }
         ],
         "tags": [
@@ -318,17 +538,16 @@
         "tags": [
           "Clusters"
         ]
-      }
-    },
-    "/api/fulfillment/v1/clusters/{cluster_id}": {
-      "get": {
-        "summary": "Retrieves the details of one specific cluster.",
-        "operationId": "Clusters_Get",
+      },
+      "post": {
+        "summary": "Creates a new cluster.",
+        "description": "Note that this operation is not allowed for regular users, only for the server. Regular users create clusters\nindirectly, creating a cluster order that will eventually result in the system creating a cluster.",
+        "operationId": "Clusters_Create",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
-              "$ref": "#/definitions/v1ClustersGetResponse"
+              "$ref": "#/definitions/v1Cluster"
             }
           },
           "default": {
@@ -340,7 +559,69 @@
         },
         "parameters": [
           {
-            "name": "cluster_id",
+            "name": "object",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Cluster"
+            }
+          }
+        ],
+        "tags": [
+          "Clusters"
+        ]
+      }
+    },
+    "/api/fulfillment/v1/clusters/{id}": {
+      "get": {
+        "summary": "Retrieves the details of one specific cluster.",
+        "operationId": "Clusters_Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1Cluster"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Clusters"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a cluster.",
+        "operationId": "Clusters_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ClustersDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -351,7 +632,7 @@
         ]
       }
     },
-    "/api/fulfillment/v1/clusters/{cluster_id}/kubeconfig": {
+    "/api/fulfillment/v1/clusters/{id}/kubeconfig": {
       "get": {
         "summary": "Returns the admin Kubeconfig of the cluster.",
         "description": "This is intended for use with HTTP and returns the YAML text of the Kubeconfig directly using the content type\n`application/yaml`.\n\nbuf:lint:ignore RPC_RESPONSE_STANDARD_NAME",
@@ -372,10 +653,63 @@
         },
         "parameters": [
           {
-            "name": "cluster_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "Clusters"
+        ]
+      }
+    },
+    "/api/fulfillment/v1/clusters/{object.id}": {
+      "patch": {
+        "summary": "Updates an existing cluster.",
+        "description": "In the HTTP+JSON version of the API this is mapped to the `PATCH` verb and the `update_mask` field is automatically\npopulated from the list of fields present in the request body. For example, to update the `state` of a cluster to\n`READY` the request line should be like this:\n\n```http\nPATCH /api/fulfillment/v1/clusters/123\n```\n\nAnd the request body should be like this:\n\n```json\n{\n  \"status\": {\n    \"state\": \"CLUSTER_STATE_READY\"\n  }\n}\n```\n\nThe response body will contain the modified object.",
+        "operationId": "Clusters_Update",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1Cluster"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "object.id",
+            "description": "Unique identifier of the cluster.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "object",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "metadata": {
+                  "$ref": "#/definitions/v1Metadata"
+                },
+                "spec": {
+                  "$ref": "#/definitions/v1ClusterSpec"
+                },
+                "status": {
+                  "$ref": "#/definitions/v1ClusterStatus"
+                }
+              },
+              "description": "Contains the details of the cluster.\n\nThe `spec` contains the desired details, and may be modified by the user. The `status` contains the current status of\nthe cluster, is provided by the system and can't be modified by the user."
+            }
           }
         ],
         "tags": [
@@ -445,6 +779,9 @@
           "type": "string",
           "description": "Unique identifier of the cluster."
         },
+        "metadata": {
+          "$ref": "#/definitions/v1Metadata"
+        },
         "spec": {
           "$ref": "#/definitions/v1ClusterSpec"
         },
@@ -462,7 +799,7 @@
           "description": "Indicates the type of condition."
         },
         "status": {
-          "type": "boolean",
+          "$ref": "#/definitions/v1ConditionStatus",
           "description": "Indicates the status of the condition."
         },
         "last_transition_time": {
@@ -498,6 +835,9 @@
         "id": {
           "type": "string",
           "description": "Unique identifier of the order.\n\nThis will be automatically generated by the system when the order is placed."
+        },
+        "metadata": {
+          "$ref": "#/definitions/v1Metadata"
         },
         "spec": {
           "$ref": "#/definitions/v1ClusterOrderSpec"
@@ -598,13 +938,21 @@
       },
       "description": "Contains the current status of the order."
     },
-    "v1ClusterOrdersCancelResponse": {
+    "v1ClusterOrdersCreateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1ClusterOrder"
+        }
+      }
+    },
+    "v1ClusterOrdersDeleteResponse": {
       "type": "object"
     },
     "v1ClusterOrdersGetResponse": {
       "type": "object",
       "properties": {
-        "order": {
+        "object": {
           "$ref": "#/definitions/v1ClusterOrder"
         }
       }
@@ -632,18 +980,10 @@
         }
       }
     },
-    "v1ClusterOrdersPlaceRequest": {
+    "v1ClusterOrdersUpdateResponse": {
       "type": "object",
       "properties": {
-        "order": {
-          "$ref": "#/definitions/v1ClusterOrder"
-        }
-      }
-    },
-    "v1ClusterOrdersPlaceResponse": {
-      "type": "object",
-      "properties": {
-        "order": {
+        "object": {
           "$ref": "#/definitions/v1ClusterOrder"
         }
       }
@@ -696,6 +1036,9 @@
           "type": "string",
           "description": "Unique identifier of the template."
         },
+        "metadata": {
+          "$ref": "#/definitions/v1Metadata"
+        },
         "title": {
           "type": "string",
           "description": "Human friendly short description of the template, only a few words, suitable for displaying in one single\nline on a UI or CLI."
@@ -745,10 +1088,21 @@
       },
       "description": "Contains type and documentation of a template parameter."
     },
+    "v1ClusterTemplatesCreateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1ClusterTemplate"
+        }
+      }
+    },
+    "v1ClusterTemplatesDeleteResponse": {
+      "type": "object"
+    },
     "v1ClusterTemplatesGetResponse": {
       "type": "object",
       "properties": {
-        "template": {
+        "object": {
           "$ref": "#/definitions/v1ClusterTemplate"
         }
       }
@@ -776,6 +1130,25 @@
         }
       }
     },
+    "v1ClusterTemplatesUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1ClusterTemplate"
+        }
+      }
+    },
+    "v1ClustersCreateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Cluster"
+        }
+      }
+    },
+    "v1ClustersDeleteResponse": {
+      "type": "object"
+    },
     "v1ClustersGetKubeconfigResponse": {
       "type": "object",
       "properties": {
@@ -787,7 +1160,7 @@
     "v1ClustersGetResponse": {
       "type": "object",
       "properties": {
-        "cluster": {
+        "object": {
           "$ref": "#/definitions/v1Cluster"
         }
       }
@@ -815,6 +1188,17 @@
         }
       }
     },
+    "v1ClustersUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Cluster"
+        },
+        "update_mask": {
+          "type": "string"
+        }
+      }
+    },
     "v1ConditionStatus": {
       "type": "string",
       "enum": [
@@ -824,6 +1208,64 @@
       ],
       "default": "CONDITION_STATUS_UNSPECIFIED",
       "description": " - CONDITION_STATUS_UNSPECIFIED: Indicates that the system can't decide if the object is in the condition or not.\n - CONDITION_STATUS_TRUE: Indicates that the object is in the condition.\n - CONDITION_STATUS_FALSE: Indicates that the object is not in the condition."
+    },
+    "v1Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the event."
+        },
+        "type": {
+          "$ref": "#/definitions/v1EventType",
+          "description": "Type of event."
+        },
+        "cluster": {
+          "$ref": "#/definitions/v1Cluster"
+        },
+        "cluster_order": {
+          "$ref": "#/definitions/v1ClusterOrder"
+        },
+        "cluster_template": {
+          "$ref": "#/definitions/v1ClusterTemplate"
+        }
+      },
+      "description": "Represents events delivered by the server."
+    },
+    "v1EventType": {
+      "type": "string",
+      "enum": [
+        "EVENT_TYPE_UNSPECIFIED",
+        "EVENT_TYPE_OBJECT_CREATED",
+        "EVENT_TYPE_OBJECT_UPDATED",
+        "EVENT_TYPE_OBJECT_DELETED"
+      ],
+      "default": "EVENT_TYPE_UNSPECIFIED",
+      "description": " - EVENT_TYPE_UNSPECIFIED: Unspecified means that the even type is unknown.\n - EVENT_TYPE_OBJECT_CREATED: Means that a new object has been created.\n\nThe payload will contain the representation of the object.\n - EVENT_TYPE_OBJECT_UPDATED: Means that an existing object has been modified.\n\nThe payload will contain the updated representation of the object.\n - EVENT_TYPE_OBJECT_DELETED: Means that an object has been deleted.\n\nThe payload will contain the representation of the object right before it was deleted."
+    },
+    "v1EventsWatchResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/definitions/v1Event"
+        }
+      }
+    },
+    "v1Metadata": {
+      "type": "object",
+      "properties": {
+        "creation_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time of creation of the object."
+        },
+        "deletion_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time of deletion of the object."
+        }
+      },
+      "description": "Metadata common to all kinds of objects."
     }
   }
 }

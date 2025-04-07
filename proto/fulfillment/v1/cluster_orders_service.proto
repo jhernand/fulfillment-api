@@ -17,6 +17,7 @@ package fulfillment.v1;
 
 import "fulfillment/v1/cluster_order_type.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
 
 message ClusterOrdersListRequest {
   // Index of the first result. If not specified the default value will be zero.
@@ -66,26 +67,35 @@ message ClusterOrdersListResponse {
 }
 
 message ClusterOrdersGetRequest {
-  string order_id = 1;
+  string id = 1;
 }
 
 message ClusterOrdersGetResponse {
-  ClusterOrder order = 1;
+  ClusterOrder object = 1;
 }
 
-message ClusterOrdersPlaceRequest {
-  ClusterOrder order = 1;
+message ClusterOrdersCreateRequest {
+  ClusterOrder object = 1;
 }
 
-message ClusterOrdersPlaceResponse {
-  ClusterOrder order = 1;
+message ClusterOrdersCreateResponse {
+  ClusterOrder object = 1;
 }
 
-message ClusterOrdersCancelRequest {
-  string order_id = 1;
+message ClusterOrdersUpdateRequest {
+  ClusterOrder object = 1;
+  google.protobuf.FieldMask update_mask = 2;
 }
 
-message ClusterOrdersCancelResponse {}
+message ClusterOrdersUpdateResponse {
+  ClusterOrder object = 1;
+}
+
+message ClusterOrdersDeleteRequest {
+  string id = 1;
+}
+
+message ClusterOrdersDeleteResponse {}
 
 service ClusterOrders {
   // Retrieves the list of cluster orders.
@@ -95,19 +105,52 @@ service ClusterOrders {
 
   // Retrieves the details of one specific cluster order.
   rpc Get(ClusterOrdersGetRequest) returns (ClusterOrdersGetResponse) {
-    option (google.api.http) = {get: "/api/fulfillment/v1/cluster_orders/{order_id}"};
-  }
-
-  // Places a new cluster order.
-  rpc Place(ClusterOrdersPlaceRequest) returns (ClusterOrdersPlaceResponse) {
     option (google.api.http) = {
-      post: "/api/fulfillment/v1/cluster_orders"
-      body: "*"
+      get: "/api/fulfillment/v1/cluster_orders/{id}"
+      response_body: "object"
     };
   }
 
-  // Cancels a cluster order.
-  rpc Cancel(ClusterOrdersCancelRequest) returns (ClusterOrdersCancelResponse) {
-    option (google.api.http) = {delete: "/api/fulfillment/v1/cluster_orders/{order_id}"};
+  // Creates a new cluster order.
+  rpc Create(ClusterOrdersCreateRequest) returns (ClusterOrdersCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/fulfillment/v1/cluster_orders"
+      body: "object"
+      response_body: "object"
+    };
+  }
+
+  // Updates an existing cluster order.
+  //
+  // In the HTTP+JSON version of the API this is mapped to the `PATCH` verb and the `update_mask` field is automatically
+  // populated from the list of fields present in the request body. For example, to update the `state` of an order to
+  // `FULFILLED` the request line should be like this:
+  //
+  // ```http
+  // PATCH /api/fulfillment/v1/cluster_orders/123
+  // ```
+  //
+  // And the request body should be like this:
+  //
+  // ```json
+  // {
+  //   "status": {
+  //     "state": "CLUSTER_ORDER_STATE_FULFILLED"
+  //   }
+  // }
+  // ```
+  //
+  // The response body will contain the modified object.
+  rpc Update(ClusterOrdersUpdateRequest) returns (ClusterOrdersUpdateResponse) {
+    option (google.api.http) = {
+      patch: "/api/fulfillment/v1/cluster_orders/{object.id}"
+      body: "object"
+      response_body: "object"
+    };
+  }
+
+  // Delete a cluster order.
+  rpc Delete(ClusterOrdersDeleteRequest) returns (ClusterOrdersDeleteResponse) {
+    option (google.api.http) = {delete: "/api/fulfillment/v1/cluster_orders/{id}"};
   }
 }
