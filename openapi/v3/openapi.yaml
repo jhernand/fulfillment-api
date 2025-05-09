@@ -15,7 +15,7 @@ tags:
 - name: ClusterOrders
 - name: ClusterTemplates
 - name: Clusters
-- name: HostClasses
+- name: ResourceClasses
 paths:
   /api/events/v1/events:
     get:
@@ -711,12 +711,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
       x-codegen-request-body-name: object
-  /api/fulfillment/v1/host_classes:
+  /api/fulfillment/v1/resource_classes:
     get:
       tags:
-      - HostClasses
-      summary: Retrieves the list of host classes.
-      operationId: HostClasses_List
+      - ResourceClasses
+      summary: Retrieves the list of resource classes.
+      operationId: ResourceClasses_List
       parameters:
       - name: offset
         in: query
@@ -781,7 +781,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1HostClassesListResponse"
+                $ref: "#/components/schemas/v1ResourceClassesListResponse"
         default:
           description: An unexpected error response.
           content:
@@ -790,16 +790,16 @@ paths:
                 $ref: "#/components/schemas/rpcStatus"
     post:
       tags:
-      - HostClasses
-      summary: Creates a new host class.
+      - ResourceClasses
+      summary: Creates a new resource class.
       description: "This method isn't allowed for regular users, only for the system\
         \ itself."
-      operationId: HostClasses_Create
+      operationId: ResourceClasses_Create
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/v1HostClass"
+              $ref: "#/components/schemas/v1ResourceClass"
         required: true
       responses:
         "200":
@@ -807,7 +807,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1HostClass"
+                $ref: "#/components/schemas/v1ResourceClass"
         default:
           description: An unexpected error response.
           content:
@@ -815,12 +815,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
       x-codegen-request-body-name: object
-  /api/fulfillment/v1/host_classes/{id}:
+  /api/fulfillment/v1/resource_classes/{id}:
     get:
       tags:
-      - HostClasses
-      summary: Retrieves the details of one specific host classes.
-      operationId: HostClasses_Get
+      - ResourceClasses
+      summary: Retrieves the details of one specific resource class.
+      operationId: ResourceClasses_Get
       parameters:
       - name: id
         in: path
@@ -835,7 +835,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1HostClass"
+                $ref: "#/components/schemas/v1ResourceClass"
         default:
           description: An unexpected error response.
           content:
@@ -844,11 +844,11 @@ paths:
                 $ref: "#/components/schemas/rpcStatus"
     delete:
       tags:
-      - HostClasses
-      summary: Delete a host class.
+      - ResourceClasses
+      summary: Delete a resource class.
       description: "This method isn't allowed for regular users, only for the system\
         \ itself."
-      operationId: HostClasses_Delete
+      operationId: ResourceClasses_Delete
       parameters:
       - name: id
         in: path
@@ -863,21 +863,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1HostClassesDeleteResponse"
+                $ref: "#/components/schemas/v1ResourceClassesDeleteResponse"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/rpcStatus"
-  /api/fulfillment/v1/host_classes/{object.id}:
+  /api/fulfillment/v1/resource_classes/{object.id}:
     patch:
       tags:
-      - HostClasses
-      summary: Updates an existint host class.
+      - ResourceClasses
+      summary: Updates an existint resource class.
       description: "This method isn't allowed for regular users, only for the system\
         \ itself."
-      operationId: HostClasses_Update
+      operationId: ResourceClasses_Update
       parameters:
       - name: object.id
         in: path
@@ -891,7 +891,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/host_classes_object_id_body"
+              $ref: "#/components/schemas/resource_classes_object_id_body"
         required: true
       responses:
         "200":
@@ -899,7 +899,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/v1HostClass"
+                $ref: "#/components/schemas/v1ResourceClass"
         default:
           description: An unexpected error response.
           content:
@@ -1176,16 +1176,16 @@ components:
     v1ClusterNodeSet:
       type: object
       properties:
-        host_class:
+        resource_class:
           type: string
           description: |-
             Identifier of the class of hosts that are part of the set.
 
-            The details of the host class can be obtained using the `List` and `Get` method of the `HostClasses` service. For
-            example, to get the details of the `acme_1tb` host class using the HTTP+JSON version of the API:
+            The details of the resource class can be obtained using the `List` and `Get` method of the `ResourceClasses`
+            service. For example, to get the details of the `acme_1tb` resource class using the HTTP+JSON version of the API:
 
             ```http
-            GET /api/fulfillment/v1/host_classes/acme_1tb
+            GET /api/fulfillment/v1/resource_classes/acme_1tb
             ```
 
             Which will return something like this:
@@ -1471,11 +1471,11 @@ components:
               "spec": {
                 "node_sets": {
                   "compute": {
-                    "host_class": "acme_1tb",
+                    "resource_class": "acme_1tb",
                     "size": 3
                   },
                   "gpu": {
-                    "host_class": "acme_1tb_h100",
+                    "resource_class": "acme_1tb_h100",
                     "size": 3
                   }
                 }
@@ -1484,11 +1484,11 @@ components:
                 "state": "CLUSTER_STATE_READY",
                 "node_sets": {
                   "compute": {
-                    "host_class": "acme_1tb",
+                    "resource_class": "acme_1tb",
                     "size": 3
                   },
                   "gpu": {
-                    "host_class": "acme_1tb_h100",
+                    "resource_class": "acme_1tb_h100",
                     "size": 3
                   }
                 }
@@ -1496,7 +1496,7 @@ components:
             }
             ```
 
-            The user will not be allowed to change the `host_class` field.
+            The user will not be allowed to change the `resource_class` field.
 
             The user will not be allowed to remove existing node sets, or add new node sets.
 
@@ -1808,7 +1808,19 @@ components:
       properties:
         event:
           $ref: "#/components/schemas/v1Event"
-    v1HostClass:
+    v1Metadata:
+      type: object
+      properties:
+        creation_timestamp:
+          type: string
+          description: Time of creation of the object.
+          format: date-time
+        deletion_timestamp:
+          type: string
+          description: Time of deletion of the object.
+          format: date-time
+      description: Metadata common to all kinds of objects.
+    v1ResourceClass:
       type: object
       properties:
         id:
@@ -1819,12 +1831,12 @@ components:
         title:
           type: string
           description: |-
-            Human friendly short description of the host class, only a few words, suitable for displaying in one single
+            Human friendly short description of the resource class, only a few words, suitable for displaying in one single
             line on a UI or CLI.
         description:
           type: string
-          description: "Human friendly long description of the host class, using Markdown\
-            \ format."
+          description: "Human friendly long description of the resource class, using\
+            \ Markdown format."
       description: |-
         Describes a set of hosts that share characteristics.
 
@@ -1834,19 +1846,19 @@ components:
         This is similar to the _instance type_ concept used by many cloud providers.
 
         The detailed chracteristics of the host (CPU, memory, GPU, etc) will be in the `description` field.
-    v1HostClassesCreateResponse:
+    v1ResourceClassesCreateResponse:
       type: object
       properties:
         object:
-          $ref: "#/components/schemas/v1HostClass"
-    v1HostClassesDeleteResponse:
+          $ref: "#/components/schemas/v1ResourceClass"
+    v1ResourceClassesDeleteResponse:
       type: object
-    v1HostClassesGetResponse:
+    v1ResourceClassesGetResponse:
       type: object
       properties:
         object:
-          $ref: "#/components/schemas/v1HostClass"
-    v1HostClassesListResponse:
+          $ref: "#/components/schemas/v1ResourceClass"
+    v1ResourceClassesListResponse:
       type: object
       properties:
         size:
@@ -1866,24 +1878,12 @@ components:
           type: array
           description: List of results.
           items:
-            $ref: "#/components/schemas/v1HostClass"
-    v1HostClassesUpdateResponse:
+            $ref: "#/components/schemas/v1ResourceClass"
+    v1ResourceClassesUpdateResponse:
       type: object
       properties:
         object:
-          $ref: "#/components/schemas/v1HostClass"
-    v1Metadata:
-      type: object
-      properties:
-        creation_timestamp:
-          type: string
-          description: Time of creation of the object.
-          format: date-time
-        deletion_timestamp:
-          type: string
-          description: Time of deletion of the object.
-          format: date-time
-      description: Metadata common to all kinds of objects.
+          $ref: "#/components/schemas/v1ResourceClass"
     Stream result of v1EventsWatchResponse:
       title: Stream result of v1EventsWatchResponse
       type: object
@@ -1944,7 +1944,7 @@ components:
 
         The `spec` contains the desired details, and may be modified by the user. The `status` contains the current status of
         the cluster, is provided by the system and can't be modified by the user.
-    host_classes_object_id_body:
+    resource_classes_object_id_body:
       type: object
       properties:
         metadata:
@@ -1952,12 +1952,12 @@ components:
         title:
           type: string
           description: |-
-            Human friendly short description of the host class, only a few words, suitable for displaying in one single
+            Human friendly short description of the resource class, only a few words, suitable for displaying in one single
             line on a UI or CLI.
         description:
           type: string
-          description: "Human friendly long description of the host class, using Markdown\
-            \ format."
+          description: "Human friendly long description of the resource class, using\
+            \ Markdown format."
       description: |-
         Describes a set of hosts that share characteristics.
 

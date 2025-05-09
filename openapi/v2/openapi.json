@@ -26,7 +26,7 @@
       "name": "Clusters"
     },
     {
-      "name": "HostClasses"
+      "name": "ResourceClasses"
     }
   ],
   "schemes": [
@@ -720,15 +720,15 @@
         ]
       }
     },
-    "/api/fulfillment/v1/host_classes": {
+    "/api/fulfillment/v1/resource_classes": {
       "get": {
-        "summary": "Retrieves the list of host classes.",
-        "operationId": "HostClasses_List",
+        "summary": "Retrieves the list of resource classes.",
+        "operationId": "ResourceClasses_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1HostClassesListResponse"
+              "$ref": "#/definitions/v1ResourceClassesListResponse"
             }
           },
           "default": {
@@ -771,18 +771,18 @@
           }
         ],
         "tags": [
-          "HostClasses"
+          "ResourceClasses"
         ]
       },
       "post": {
-        "summary": "Creates a new host class.",
+        "summary": "Creates a new resource class.",
         "description": "This method isn't allowed for regular users, only for the system itself.",
-        "operationId": "HostClasses_Create",
+        "operationId": "ResourceClasses_Create",
         "responses": {
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/v1HostClass"
+              "$ref": "#/definitions/v1ResourceClass"
             }
           },
           "default": {
@@ -798,24 +798,24 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1HostClass"
+              "$ref": "#/definitions/v1ResourceClass"
             }
           }
         ],
         "tags": [
-          "HostClasses"
+          "ResourceClasses"
         ]
       }
     },
-    "/api/fulfillment/v1/host_classes/{id}": {
+    "/api/fulfillment/v1/resource_classes/{id}": {
       "get": {
-        "summary": "Retrieves the details of one specific host classes.",
-        "operationId": "HostClasses_Get",
+        "summary": "Retrieves the details of one specific resource class.",
+        "operationId": "ResourceClasses_Get",
         "responses": {
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/v1HostClass"
+              "$ref": "#/definitions/v1ResourceClass"
             }
           },
           "default": {
@@ -834,18 +834,18 @@
           }
         ],
         "tags": [
-          "HostClasses"
+          "ResourceClasses"
         ]
       },
       "delete": {
-        "summary": "Delete a host class.",
+        "summary": "Delete a resource class.",
         "description": "This method isn't allowed for regular users, only for the system itself.",
-        "operationId": "HostClasses_Delete",
+        "operationId": "ResourceClasses_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1HostClassesDeleteResponse"
+              "$ref": "#/definitions/v1ResourceClassesDeleteResponse"
             }
           },
           "default": {
@@ -864,20 +864,20 @@
           }
         ],
         "tags": [
-          "HostClasses"
+          "ResourceClasses"
         ]
       }
     },
-    "/api/fulfillment/v1/host_classes/{object.id}": {
+    "/api/fulfillment/v1/resource_classes/{object.id}": {
       "patch": {
-        "summary": "Updates an existint host class.",
+        "summary": "Updates an existint resource class.",
         "description": "This method isn't allowed for regular users, only for the system itself.",
-        "operationId": "HostClasses_Update",
+        "operationId": "ResourceClasses_Update",
         "responses": {
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/v1HostClass"
+              "$ref": "#/definitions/v1ResourceClass"
             }
           },
           "default": {
@@ -904,15 +904,15 @@
               "properties": {
                 "metadata": {
                   "$ref": "#/definitions/v1Metadata",
-                  "description": "Metadata of the host class."
+                  "description": "Metadata of the resource class."
                 },
                 "title": {
                   "type": "string",
-                  "description": "Human friendly short description of the host class, only a few words, suitable for displaying in one single\nline on a UI or CLI."
+                  "description": "Human friendly short description of the resource class, only a few words, suitable for displaying in one single\nline on a UI or CLI."
                 },
                 "description": {
                   "type": "string",
-                  "description": "Human friendly long description of the host class, using Markdown format."
+                  "description": "Human friendly long description of the resource class, using Markdown format."
                 }
               },
               "description": "Describes a set of hosts that share characteristics.\n\nFor example there could be a host class `acme_1tb` to describe the set of hosts manifactured by ACME and with 1 TiB\nof RAM, and another `ibm_mi300x` to describe the set of hosts manufactured IBM and with a MI300X GPU.\n\nThis is similar to the _instance type_ concept used by many cloud providers.\n\nThe detailed chracteristics of the host (CPU, memory, GPU, etc) will be in the `description` field."
@@ -920,7 +920,7 @@
           }
         ],
         "tags": [
-          "HostClasses"
+          "ResourceClasses"
         ]
       }
     }
@@ -1040,9 +1040,9 @@
     "v1ClusterNodeSet": {
       "type": "object",
       "properties": {
-        "host_class": {
+        "resource_class": {
           "type": "string",
-          "description": "Identifier of the class of hosts that are part of the set.\n\nThe details of the host class can be obtained using the `List` and `Get` method of the `HostClasses` service. For\nexample, to get the details of the `acme_1tb` host class using the HTTP+JSON version of the API:\n\n```http\nGET /api/fulfillment/v1/host_classes/acme_1tb\n```\n\nWhich will return something like this:\n\n```json\n{\n  \"id\": \"acme_1tb\",\n  \"title\": \"ACME server with 1 TiB of RAM and no GPU\",\n  \"description\": \"ACME server model XYZ with 1 TiB of RAM, 2 Xeon 6 CPUS and no GPU.\"\n}\n```\n\nThis will be set by the system when the cluster is initially created, according to the template selected by the\nuser.\n\nThe user will not have permission to change this field."
+          "description": "Identifier of the class of hosts that are part of the set.\n\nThe details of the resource class can be obtained using the `List` and `Get` method of the `ResourceClasses`\nservice. For example, to get the details of the `acme_1tb` resource class using the HTTP+JSON version of the API:\n\n```http\nGET /api/fulfillment/v1/resource_classes/acme_1tb\n```\n\nWhich will return something like this:\n\n```json\n{\n  \"id\": \"acme_1tb\",\n  \"title\": \"ACME server with 1 TiB of RAM and no GPU\",\n  \"description\": \"ACME server model XYZ with 1 TiB of RAM, 2 Xeon 6 CPUS and no GPU.\"\n}\n```\n\nThis will be set by the system when the cluster is initially created, according to the template selected by the\nuser.\n\nThe user will not have permission to change this field."
         },
         "size": {
           "type": "integer",
@@ -1219,7 +1219,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/v1ClusterNodeSet"
           },
-          "description": "Desired node sets of the cluster.\n\nThis will be automatically set by the system when the cluster is initially created, according to the template\nselected by the user, and can be later modified to change the size.\n\nThe key of the map is the unique identifier of the node set for this cluster.\n\nFor example, a cluster created with two different node sets, one for nodes without GPUs and another for nodes with\nGPUs could be represented like this:\n\n```json\n{\n  \"id\": \"123\",\n  \"spec\": {\n    \"node_sets\": {\n      \"compute\": {\n        \"host_class\": \"acme_1tb\",\n        \"size\": 3\n      },\n      \"gpu\": {\n        \"host_class\": \"acme_1tb_h100\",\n        \"size\": 3\n      }\n    }\n  },\n  \"status\": {\n    \"state\": \"CLUSTER_STATE_READY\",\n    \"node_sets\": {\n      \"compute\": {\n        \"host_class\": \"acme_1tb\",\n        \"size\": 3\n      },\n      \"gpu\": {\n        \"host_class\": \"acme_1tb_h100\",\n        \"size\": 3\n      }\n    }\n  }\n}\n```\n\nThe user will not be allowed to change the `host_class` field.\n\nThe user will not be allowed to remove existing node sets, or add new node sets.\n\nThe user will be allowed to update `size` field.\n\nIf at any time the system can't allocate the number of nodes requested by the user, because of permissions, quota,\navailability of resources or system errors, the cluster will be marked as degraded, and the details will be in the\n`DEGRADED` condition."
+          "description": "Desired node sets of the cluster.\n\nThis will be automatically set by the system when the cluster is initially created, according to the template\nselected by the user, and can be later modified to change the size.\n\nThe key of the map is the unique identifier of the node set for this cluster.\n\nFor example, a cluster created with two different node sets, one for nodes without GPUs and another for nodes with\nGPUs could be represented like this:\n\n```json\n{\n  \"id\": \"123\",\n  \"spec\": {\n    \"node_sets\": {\n      \"compute\": {\n        \"resource_class\": \"acme_1tb\",\n        \"size\": 3\n      },\n      \"gpu\": {\n        \"resource_class\": \"acme_1tb_h100\",\n        \"size\": 3\n      }\n    }\n  },\n  \"status\": {\n    \"state\": \"CLUSTER_STATE_READY\",\n    \"node_sets\": {\n      \"compute\": {\n        \"resource_class\": \"acme_1tb\",\n        \"size\": 3\n      },\n      \"gpu\": {\n        \"resource_class\": \"acme_1tb_h100\",\n        \"size\": 3\n      }\n    }\n  }\n}\n```\n\nThe user will not be allowed to change the `resource_class` field.\n\nThe user will not be allowed to remove existing node sets, or add new node sets.\n\nThe user will be allowed to update `size` field.\n\nIf at any time the system can't allocate the number of nodes requested by the user, because of permissions, quota,\navailability of resources or system errors, the cluster will be marked as degraded, and the details will be in the\n`DEGRADED` condition."
         }
       },
       "description": "The spec contains the details of a cluster as desired by the user."
@@ -1490,7 +1490,23 @@
         }
       }
     },
-    "v1HostClass": {
+    "v1Metadata": {
+      "type": "object",
+      "properties": {
+        "creation_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time of creation of the object."
+        },
+        "deletion_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time of deletion of the object."
+        }
+      },
+      "description": "Metadata common to all kinds of objects."
+    },
+    "v1ResourceClass": {
       "type": "object",
       "properties": {
         "id": {
@@ -1499,39 +1515,39 @@
         },
         "metadata": {
           "$ref": "#/definitions/v1Metadata",
-          "description": "Metadata of the host class."
+          "description": "Metadata of the resource class."
         },
         "title": {
           "type": "string",
-          "description": "Human friendly short description of the host class, only a few words, suitable for displaying in one single\nline on a UI or CLI."
+          "description": "Human friendly short description of the resource class, only a few words, suitable for displaying in one single\nline on a UI or CLI."
         },
         "description": {
           "type": "string",
-          "description": "Human friendly long description of the host class, using Markdown format."
+          "description": "Human friendly long description of the resource class, using Markdown format."
         }
       },
       "description": "Describes a set of hosts that share characteristics.\n\nFor example there could be a host class `acme_1tb` to describe the set of hosts manifactured by ACME and with 1 TiB\nof RAM, and another `ibm_mi300x` to describe the set of hosts manufactured IBM and with a MI300X GPU.\n\nThis is similar to the _instance type_ concept used by many cloud providers.\n\nThe detailed chracteristics of the host (CPU, memory, GPU, etc) will be in the `description` field."
     },
-    "v1HostClassesCreateResponse": {
+    "v1ResourceClassesCreateResponse": {
       "type": "object",
       "properties": {
         "object": {
-          "$ref": "#/definitions/v1HostClass"
+          "$ref": "#/definitions/v1ResourceClass"
         }
       }
     },
-    "v1HostClassesDeleteResponse": {
+    "v1ResourceClassesDeleteResponse": {
       "type": "object"
     },
-    "v1HostClassesGetResponse": {
+    "v1ResourceClassesGetResponse": {
       "type": "object",
       "properties": {
         "object": {
-          "$ref": "#/definitions/v1HostClass"
+          "$ref": "#/definitions/v1ResourceClass"
         }
       }
     },
-    "v1HostClassesListResponse": {
+    "v1ResourceClassesListResponse": {
       "type": "object",
       "properties": {
         "size": {
@@ -1548,35 +1564,19 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1HostClass"
+            "$ref": "#/definitions/v1ResourceClass"
           },
           "description": "List of results."
         }
       }
     },
-    "v1HostClassesUpdateResponse": {
+    "v1ResourceClassesUpdateResponse": {
       "type": "object",
       "properties": {
         "object": {
-          "$ref": "#/definitions/v1HostClass"
+          "$ref": "#/definitions/v1ResourceClass"
         }
       }
-    },
-    "v1Metadata": {
-      "type": "object",
-      "properties": {
-        "creation_timestamp": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time of creation of the object."
-        },
-        "deletion_timestamp": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time of deletion of the object."
-        }
-      },
-      "description": "Metadata common to all kinds of objects."
     }
   }
 }

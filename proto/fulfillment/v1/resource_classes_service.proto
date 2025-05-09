@@ -15,11 +15,11 @@ syntax = "proto3";
 
 package fulfillment.v1;
 
-import "fulfillment/v1/host_class_type.proto";
+import "fulfillment/v1/resource_class_type.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 
-message HostClassesListRequest {
+message ResourceClassesListRequest {
   // Index of the first result. If not specified the default value will be zero.
   optional int32 offset = 1;
 
@@ -52,7 +52,7 @@ message HostClassesListRequest {
   optional string order = 4;
 }
 
-message HostClassesListResponse {
+message ResourceClassesListResponse {
   // Actual number of items returned. Note that this may be smaller than the value requested in the `limit` parameter
   // of the request if there are not enough items, or of the system decides that returning that number of items isn't
   // feasible or convenient for performance reasons.
@@ -63,80 +63,80 @@ message HostClassesListResponse {
   optional int32 total = 4;
 
   // List of results.
-  repeated HostClass items = 5;
+  repeated ResourceClass items = 5;
 }
 
-message HostClassesGetRequest {
+message ResourceClassesGetRequest {
   string id = 1;
 }
 
-message HostClassesGetResponse {
-  HostClass object = 1;
+message ResourceClassesGetResponse {
+  ResourceClass object = 1;
 }
 
-message HostClassesCreateRequest {
-  HostClass object = 1;
+message ResourceClassesCreateRequest {
+  ResourceClass object = 1;
 }
 
-message HostClassesCreateResponse {
-  HostClass object = 1;
+message ResourceClassesCreateResponse {
+  ResourceClass object = 1;
 }
 
-message HostClassesUpdateRequest {
-  HostClass object = 1;
+message ResourceClassesUpdateRequest {
+  ResourceClass object = 1;
   google.protobuf.FieldMask update_mask = 2;
 }
 
-message HostClassesUpdateResponse {
-  HostClass object = 1;
+message ResourceClassesUpdateResponse {
+  ResourceClass object = 1;
 }
 
-message HostClassesDeleteRequest {
+message ResourceClassesDeleteRequest {
   string id = 1;
 }
 
-message HostClassesDeleteResponse {}
+message ResourceClassesDeleteResponse {}
 
-service HostClasses {
-  // Retrieves the list of host classes.
-  rpc List(HostClassesListRequest) returns (HostClassesListResponse) {
-    option (google.api.http) = {get: "/api/fulfillment/v1/host_classes"};
+service ResourceClasses {
+  // Retrieves the list of resource classes.
+  rpc List(ResourceClassesListRequest) returns (ResourceClassesListResponse) {
+    option (google.api.http) = {get: "/api/fulfillment/v1/resource_classes"};
   }
 
-  // Retrieves the details of one specific host classes.
-  rpc Get(HostClassesGetRequest) returns (HostClassesGetResponse) {
+  // Retrieves the details of one specific resource class.
+  rpc Get(ResourceClassesGetRequest) returns (ResourceClassesGetResponse) {
     option (google.api.http) = {
-      get: "/api/fulfillment/v1/host_classes/{id}"
+      get: "/api/fulfillment/v1/resource_classes/{id}"
       response_body: "object"
     };
   }
 
-  // Creates a new host class.
+  // Creates a new resource class.
   //
   // This method isn't allowed for regular users, only for the system itself.
-  rpc Create(HostClassesCreateRequest) returns (HostClassesCreateResponse) {
+  rpc Create(ResourceClassesCreateRequest) returns (ResourceClassesCreateResponse) {
     option (google.api.http) = {
-      post: "/api/fulfillment/v1/host_classes"
+      post: "/api/fulfillment/v1/resource_classes"
       body: "object"
       response_body: "object"
     };
   }
 
-  // Updates an existint host class.
+  // Updates an existint resource class.
   //
   // This method isn't allowed for regular users, only for the system itself.
-  rpc Update(HostClassesUpdateRequest) returns (HostClassesUpdateResponse) {
+  rpc Update(ResourceClassesUpdateRequest) returns (ResourceClassesUpdateResponse) {
     option (google.api.http) = {
-      patch: "/api/fulfillment/v1/host_classes/{object.id}"
+      patch: "/api/fulfillment/v1/resource_classes/{object.id}"
       body: "object"
       response_body: "object"
     };
   }
 
-  // Delete a host class.
+  // Delete a resource class.
   //
   // This method isn't allowed for regular users, only for the system itself.
-  rpc Delete(HostClassesDeleteRequest) returns (HostClassesDeleteResponse) {
-    option (google.api.http) = {delete: "/api/fulfillment/v1/host_classes/{id}"};
+  rpc Delete(ResourceClassesDeleteRequest) returns (ResourceClassesDeleteResponse) {
+    option (google.api.http) = {delete: "/api/fulfillment/v1/resource_classes/{id}"};
   }
 }
